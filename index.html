@@ -37,7 +37,8 @@ a{color:inherit}
 .cabecera .envoltura{height:100%;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .marca{display:flex;align-items:center;gap:10px;text-decoration:none;font:700 20px/1 var(--zilla);letter-spacing:-.3px}
 .marca .rafaga{width:28px;height:28px;flex:none}
-.cabecera nav a{font:500 14px/1 var(--jost);text-decoration:none;padding:10px 0;border-bottom:2px solid var(--acento)}
+.cabecera nav a{font:500 14px/1 var(--jost);text-decoration:none;padding:10px 0;border-bottom:2px solid var(--linea);transition:border-color .15s}
+.cabecera nav a:hover{border-bottom-color:var(--acento)}
 
 /* Hero */
 .hero{position:relative;overflow:hidden;background:var(--papel);border-bottom:1px solid var(--linea)}
@@ -58,6 +59,7 @@ a{color:inherit}
 .fila{display:flex;gap:8px;align-items:center}
 .busca{flex:1 1 auto;min-width:0;height:44px;padding:0 12px;border:1px solid var(--linea);background:var(--papel);-webkit-appearance:none;appearance:none}
 .busca::placeholder{color:var(--gris)}
+.estados[hidden]{display:none}
 .estados{flex:0 0 auto;max-width:44%;height:44px;padding:0 32px 0 12px;border:1px solid var(--linea);background:var(--papel) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23000'/%3E%3C/svg%3E") no-repeat right 12px center;-webkit-appearance:none;appearance:none;text-overflow:ellipsis}
 .chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1 * var(--gutter));padding:2px var(--gutter)}
 .chips::-webkit-scrollbar{display:none}
@@ -105,15 +107,14 @@ main .envoltura{padding-top:20px;padding-bottom:56px}
 .pildora{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:6px 10px;border:1px solid var(--linea);font:600 13px/1 var(--zilla)}
 .pildora .flecha{color:var(--acento)}
 .ficha .texto{margin:14px 0 0;font:300 16px/1.5 var(--jost)}
-.ficha h3{margin:22px 0 8px;font:600 16px/1 var(--zilla)}
-.trae{list-style:none;margin:0;padding:0;border-top:1px solid var(--linea)}
-.trae li{padding:9px 0;border-bottom:1px solid var(--linea);font:400 15px/1.35 var(--jost)}
 .meta{margin:22px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--linea);border:1px solid var(--linea)}
 .meta div{background:var(--papel);padding:10px 12px}
+.meta div:last-child:nth-child(odd){grid-column:1/-1}
 .meta dt{font:400 12px/1.2 var(--jost);color:var(--gris);text-transform:uppercase;letter-spacing:.06em}
 .meta dd{margin:4px 0 0;font:500 15px/1.3 var(--jost)}
 .contacto{margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .contacto a{display:flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:0 10px;border:0;text-decoration:none;font:500 15px/1.1 var(--jost);color:#fff;text-align:center;overflow-wrap:anywhere}
+.contacto.uno{grid-template-columns:1fr}
 .contacto svg{width:20px;height:20px;flex:none}
 .wa{background:#04893D;color:#fff}
 .ig{background:linear-gradient(135deg,#DD2A7B 0%,#8134AF 55%,#515BD4 100%);color:#fff}
@@ -159,9 +160,9 @@ main .envoltura{padding-top:20px;padding-bottom:56px}
     <h1>Lo que trajimos de casa</h1>
     <p class="sub">Comida, moda y arte hechos por estudiantes que vienen de toda la República, y por los de aquí. Dos días en la explanada central, de 10:00 a 18:00.</p>
     <ul class="datos">
-      <li><b>61</b><span>negocios</span></li>
-      <li><b>15</b><span>foráneos</span></li>
-      <li><b>10</b><span>estados</span></li>
+      <li><b data-dato="total"></b><span>negocios</span></li>
+      <li><b data-dato="foraneos"></b><span>foráneos</span></li>
+      <li data-dato-li="estados" hidden><b data-dato="estados"></b><span>estados</span></li>
       <li><b>30 sep</b><span>y 1 de octubre</span></li>
     </ul>
   </div>
@@ -173,7 +174,7 @@ main .envoltura{padding-top:20px;padding-bottom:56px}
       <label class="sr" for="busca">Buscar negocios</label>
       <input id="busca" class="busca" type="search" placeholder="Buscar tamales, café, aretes…" autocomplete="off">
       <label class="sr" for="estado">Estado de origen</label>
-      <select id="estado" class="estados"><option value="">Todos los estados</option></select>
+      <select id="estado" class="estados" hidden><option value="">Todos los estados</option></select>
     </div>
     <div class="chips" id="chips" role="group" aria-label="Filtrar por categoría"></div>
     <div class="pie-filtros">
@@ -250,37 +251,84 @@ function patron(id){
   return {svg,tinta:i<CORTE?"#FFFFFF":"#000000"};
 }
 
-const TOTAL=61;
-const CATEGORIAS=["Comida","Postres","Bebidas","Moda","Accesorios","Arte"];
 const MENSAJE="Hola, los vi en el catálogo del Mercadito Foráneo de ADEFA.";
 
-// Um objeto por negócio, espelho de uma linha da planilha. estado vazio = local.
-const NEGOCIOS=[
-  {id:"E-001",nombre:"Tamales de la Abuela Chela",categoria:"Comida",estado:"Veracruz",desc:"Tamales envueltos en hoja de plátano y zacahuil por porción, con la receta de la Huasteca veracruzana.",productos:["Tamal de hoja de plátano con pollo","Zacahuil por porción","Champurrado de piloncillo"],rango:"$35 – $120",stand:"A-01",pagos:"Efectivo, transferencia",wa:"522291847362",ig:"tamales.chela"},
-  {id:"E-002",nombre:"Carne Seca Cerro de la Silla",categoria:"Comida",estado:"Nuevo León",desc:"Machaca de res secada al sol en Monterrey y tortillas de harina sobaqueras hechas a mano.",productos:["Machaca de res 250 g","Tortillas de harina sobaqueras (docena)","Salsa de chile piquín"],rango:"$60 – $280",stand:"A-02",pagos:"Efectivo, tarjeta, transferencia",wa:"528116203948",ig:"carneseca.cerro"},
-  {id:"E-003",nombre:"Tlayudas Monte Albán",categoria:"Comida",estado:"Oaxaca",desc:"Tlayudas al comal con asiento, quesillo y tasajo que traemos de los Valles Centrales.",productos:["Tlayuda de tasajo","Memela con asiento y quesillo","Chapulines con limón"],rango:"$45 – $180",stand:"A-03",pagos:"Efectivo, transferencia",wa:"529512746031",ig:"tlayudas.montealban"},
-  {id:"E-004",nombre:"Hilo Mixteco",categoria:"Moda",estado:"Oaxaca",desc:"Blusas y huipiles bordados a mano por artesanas de la Mixteca, con diseños que cambian cada temporada.",productos:["Blusa bordada de manta","Huipil corto de telar","Bolsa tejida de palma"],rango:"$280 – $1,450",stand:"A-04",pagos:"Efectivo, tarjeta, transferencia",wa:"529531058274",ig:"hilomixteco"},
-  {id:"E-005",nombre:"Talavera Chiquita",categoria:"Arte",estado:"Puebla",desc:"Talavera poblana en miniatura: azulejos, platitos y macetas pintadas a mano en taller familiar.",productos:["Azulejo de talavera 10 × 10 cm","Maceta miniatura","Plato decorativo pintado a mano"],rango:"$70 – $520",stand:"A-05",pagos:"Efectivo, transferencia",wa:"522226491385",ig:"talavera.chiquita"},
-  {id:"E-006",nombre:"Café Tacaná",categoria:"Bebidas",estado:"Chiapas",desc:"Café de altura del volcán Tacaná, tostado en Tapachula. Lo preparamos en el momento o te lo llevas en grano.",productos:["Café de olla","Cold brew de la casa","Bolsa de café en grano 250 g"],rango:"$35 – $240",stand:"A-06",pagos:"Efectivo, tarjeta, transferencia",wa:"529626153087",ig:"cafe.tacana"},
-  {id:"E-007",nombre:"Marquesitas Paseo de Montejo",categoria:"Postres",estado:"Yucatán",desc:"Marquesitas crujientes con queso de bola, como las del parque de Santa Ana en Mérida.",productos:["Marquesita de queso de bola","Marquesita de Nutella y plátano","Champola de mamey"],rango:"$40 – $95",stand:"A-07",pagos:"Efectivo, transferencia",wa:"529992385016",ig:"marquesitas.montejo"},
-  {id:"E-008",nombre:"Jericallas Doña Lupe",categoria:"Postres",estado:"Jalisco",desc:"Jericallas tapatías con la costra quemadita, horneadas en cazuelita de barro de Tonalá.",productos:["Jericalla clásica","Jericalla de cajeta","Cocada horneada"],rango:"$30 – $110",stand:"A-08",pagos:"Efectivo",wa:"523318472650",ig:"jericallas.lupe"},
-  {id:"E-009",nombre:"Jipi de Bécal",categoria:"Accesorios",estado:"Campeche",desc:"Sombreros y abanicos de jipi japa tejidos en las cuevas de Bécal, donde la humedad hace flexible la palma.",productos:["Sombrero de jipi japa","Abanico de palma tejida","Llavero de jipi"],rango:"$60 – $1,200",stand:"A-09",pagos:"Efectivo, tarjeta",wa:"529811630472",ig:"jipidebecal"},
-  {id:"E-010",nombre:"Pozol del Grijalva",categoria:"Bebidas",estado:"Tabasco",desc:"Pozol de cacao batido a mano en jícara, frío y espeso, como se toma en Villahermosa al mediodía.",productos:["Pozol de cacao","Pozol blanco con azúcar","Dulce de coco tabasqueño"],rango:"$30 – $90",stand:"A-10",pagos:"Efectivo, transferencia",wa:"529933705128",ig:"pozol.grijalva"},
-  {id:"E-011",nombre:"Maque Uruapense",categoria:"Arte",estado:"Michoacán",desc:"Bateas y cajitas de maque, la laca prehispánica de Uruapan, decoradas con flores a punta de dedo.",productos:["Batea de maque mediana","Cajita alhajero","Aretes de maque"],rango:"$90 – $950",stand:"A-11",pagos:"Efectivo, transferencia",wa:"524521948307",ig:"maque.uruapense"},
-  {id:"E-012",nombre:"Vainilla de Papantla",categoria:"Postres",estado:"Veracruz",desc:"Vainas curadas en Papantla y postres hechos con ellas: flan, galletas y extracto puro.",productos:["Flan de vainilla","Galletas de vainilla y nuez","Extracto puro 60 ml"],rango:"$40 – $260",stand:"A-12",pagos:"Efectivo, tarjeta, transferencia",wa:"527848214936",ig:"vainilla.papantla"},
-  {id:"E-013",nombre:"Brownies del Campus",categoria:"Postres",estado:"",desc:"Brownies densos horneados la noche anterior. Hay uno sin gluten y siempre se acaba primero.",productos:["Brownie clásico","Brownie sin gluten","Blondie de nuez"],rango:"$35 – $70",stand:"B-01",pagos:"Efectivo, transferencia",wa:"525518374920",ig:"browniesdelcampus"},
-  {id:"E-014",nombre:"Aguas Frescas La Loma",categoria:"Bebidas",estado:"",desc:"Aguas de fruta de temporada sin jarabes: jamaica, horchata de arroz y la especial del día.",productos:["Agua de jamaica 1 L","Horchata de arroz 1 L","Agua del día"],rango:"$25 – $60",stand:"B-02",pagos:"Efectivo, transferencia",wa:"525540396127",ig:"aguas.laloma"},
-  {id:"E-015",nombre:"Estampa Norte",categoria:"Moda",estado:"",desc:"Playeras y tote bags serigrafiadas a mano en Huixquilucan con ilustraciones de alumnos.",productos:["Playera serigrafiada","Tote bag de manta","Sudadera edición Mercadito"],rango:"$180 – $650",stand:"B-03",pagos:"Efectivo, tarjeta, transferencia",wa:"525527104863",ig:"estampa.norte"},
-  {id:"E-016",nombre:"Resina y Flor",categoria:"Accesorios",estado:"",desc:"Aretes, anillos y separadores de resina con flores secas prensadas una por una.",productos:["Aretes de resina con flor","Anillo de resina","Separador de libros"],rango:"$90 – $320",stand:"B-04",pagos:"Efectivo, transferencia",wa:"525563820154",ig:"resinayflor"},
-  {id:"E-017",nombre:"Taller Tinta Roja",categoria:"Arte",estado:"",desc:"Grabados, prints y postales risográficas con escenas de la Ciudad de México y el Estado.",productos:["Print risográfico A4","Grabado en linóleo","Set de 5 postales"],rango:"$50 – $600",stand:"B-05",pagos:"Efectivo, tarjeta",wa:"525579310246",ig:"tintaroja.taller"},
-  {id:"E-018",nombre:"Molletes del Siete",categoria:"Comida",estado:"",desc:"Molletes de bolillo con frijol y queso gratinado, y chilaquiles para aguantar hasta la tarde.",productos:["Mollete con pico de gallo","Chilaquiles verdes","Torta de chilaquil"],rango:"$45 – $110",stand:"B-06",pagos:"Efectivo, transferencia",wa:"525592047381",ig:"molletesdelsiete"}
-].sort((a,b)=>(!!b.estado-!!a.estado)||a.stand.localeCompare(b.stand));
+// Gerado por scripts/build-data.mjs a partir de registro.xlsx. Não editar à mão.
+/* EXPOSITORES:inicio */
+const EXPOSITORES=[
+  {"id":"E-001","nombre":"Revu Shop","categoria":"Belleza y cuidado","foraneo":true,"estado":"","desc":"Maquillaje, skincare, termos y todo lo trendy para mujeres / Squishys y juguetes fidget sensoriales","desc_full":"Maquillaje, skincare, termos y todo lo trendy para mujeres / Squishys y juguetes fidget sensoriales","rango":"$250 – $1,000","stand":"","pagos":"","wa":"528666382845","ig":"revu.shop"},
+  {"id":"E-002","nombre":"Ana Janet Vera / Sebas Arce","categoria":"Joyería y accesorios","foraneo":true,"estado":"","desc":"Relojes metálicos de dama y caballero, dorados y plateados./ Vendo postres hechos en casa y con cariño, incluyendo galletas de chispas de chocolate y brownies de triple…","desc_full":"Relojes metálicos de dama y caballero, dorados y plateados./ Vendo postres hechos en casa y con cariño, incluyendo galletas de chispas de chocolate y brownies de triple chocolate","rango":"$800 – $1,900","stand":"","pagos":"","wa":"524426501820","ig":""},
+  {"id":"E-003","nombre":"Goldenbites 4","categoria":"Postres y pan","foraneo":true,"estado":"","desc":"Pan Dulce y Postres","desc_full":"Pan Dulce y Postres","rango":"$40 – $100","stand":"","pagos":"","wa":"526699183624","ig":"goldenbites_4"},
+  {"id":"E-004","nombre":"Aleabagss","categoria":"Moda","foraneo":true,"estado":"","desc":"Bolsas fashion","desc_full":"Bolsas fashion","rango":"$99 – $949","stand":"","pagos":"","wa":"529514007032","ig":"aleabagss"},
+  {"id":"E-005","nombre":"Jemis Dough","categoria":"Postres y pan","foraneo":true,"estado":"","desc":"Galletas estilo New York","desc_full":"Galletas estilo New York","rango":"$60 – $70","stand":"","pagos":"","wa":"525548881120","ig":"jemis.dough"},
+  {"id":"E-006","nombre":"Antoj Lab","categoria":"Comida y botanas","foraneo":true,"estado":"","desc":"Esquites, matcha, tostiesquites y aguas frescas de horchata y jamaica","desc_full":"Esquites, matcha, tostiesquites y aguas frescas de horchata y jamaica","rango":"$45 – $140","stand":"","pagos":"","wa":"526562536534","ig":"antoj.lab"},
+  {"id":"E-007","nombre":"Balumstudio","categoria":"Moda","foraneo":true,"estado":"","desc":"Ropa deportiva de mujer: top, leggings y chamarras de compresión","desc_full":"Ropa deportiva de mujer: top, leggings y chamarras de compresión","rango":"$140 – $690","stand":"","pagos":"","wa":"527222455270","ig":"balumstudio"},
+  {"id":"E-008","nombre":"Cosechabendita","categoria":"Comida y botanas","foraneo":true,"estado":"","desc":"Chips vegetales ( malangas ,pepino ,jicamas, zanahoria, plátanos)","desc_full":"Chips vegetales ( malangas ,pepino ,jicamas, zanahoria, plátanos)","rango":"$65 – $100","stand":"","pagos":"","wa":"522211671481","ig":"cosechabendita"},
+  {"id":"E-009","nombre":"Maria Formiga Mx Br","categoria":"Postres y pan","foraneo":true,"estado":"","desc":"Brigadeiros artesanales brasileños: bocados de chocolate y leche condensada enrollados a mano, sin gluten y sin conservadores. Muchos sabores, cajas de regalo y…","desc_full":"Brigadeiros artesanales brasileños: bocados de chocolate y leche condensada enrollados a mano, sin gluten y sin conservadores. Muchos sabores, cajas de regalo y charolas para eventos, con personalización de colores según las preferencias del cliente","rango":"","stand":"","pagos":"","wa":"525611097807","ig":"maria_formiga_mx_br"},
+  {"id":"E-010","nombre":"Lucky Things8","categoria":"Juguetes y coleccionables","foraneo":true,"estado":"","desc":"Squishies, slimes, stickers, owalas, fugglers y llaveros :)","desc_full":"Squishies, slimes, stickers, owalas, fugglers y llaveros :)","rango":"$50 – $350","stand":"","pagos":"","wa":"527227073018","ig":"lucky_things8"},
+  {"id":"E-011","nombre":"Sofía Giménez Rodríguez","categoria":"Postres y pan","foraneo":true,"estado":"","desc":"Hago galletas monchosas de diferentes sabores desde hace muchooo, hago sabores como chispas con Nutella, red velvet, smore’s, cookies and cream, brookies, lotus, peanut…","desc_full":"Hago galletas monchosas de diferentes sabores desde hace muchooo, hago sabores como chispas con Nutella, red velvet, smore’s, cookies and cream, brookies, lotus, peanut butter…","rango":"$50 – $90","stand":"","pagos":"","wa":"527774299259","ig":""},
+  {"id":"E-012","nombre":"Juan José Vázquez Acosta","categoria":"Joyería y accesorios","foraneo":true,"estado":"","desc":"Joyería de plata y accesorios varios","desc_full":"Joyería de plata y accesorios varios","rango":"$150 – $2,500","stand":"","pagos":"","wa":"524811136408","ig":""},
+  {"id":"E-013","nombre":"Bolbeck accesorios","categoria":"Juguetes y coleccionables","foraneo":false,"estado":"","desc":"Pines, llaveros metálicos, llaveros de peluche y Dupe de Termos Owala","desc_full":"Pines, llaveros metálicos, llaveros de peluche y Dupe de Termos Owala","rango":"$10 – $500","stand":"","pagos":"","wa":"525516966600","ig":"bolbeck_accesorios"},
+  {"id":"E-014","nombre":"Eliette candle shop","categoria":"Hogar y velas","foraneo":false,"estado":"","desc":"Velas, galletas y artículos de Navidad","desc_full":"Velas, galletas y artículos de Navidad","rango":"$45 – $900","stand":"","pagos":"","wa":"525569698653","ig":"eliettecandleshop"},
+  {"id":"E-015","nombre":"Palomawers Palomas Gourmet","categoria":"Comida y botanas","foraneo":false,"estado":"","desc":"Palomitas Gourmet artesanales realizadas sin conservadores de sabores dulces y salados","desc_full":"Palomitas Gourmet artesanales realizadas sin conservadores de sabores dulces y salados","rango":"$50","stand":"","pagos":"","wa":"525529357380","ig":"palomawers_gourmet"},
+  {"id":"E-016","nombre":"Paponas y enchilados","categoria":"Comida y botanas","foraneo":false,"estado":"","desc":"Papas preparadas (naturales/ adobadas/mixtas) con salsa al gusto y toppings (takis/gomitas/cacahuates) y su banderilla. Gomitas enchiladas(panditas/gusanitos/ tiritas…","desc_full":"Papas preparadas (naturales/ adobadas/mixtas) con salsa al gusto y toppings (takis/gomitas/cacahuates) y su banderilla. Gomitas enchiladas(panditas/gusanitos/ tiritas, etc) flores a crochet","rango":"$20 – $65","stand":"","pagos":"","wa":"525534207424","ig":"paponass_oficial"},
+  {"id":"E-017","nombre":"Kikashopire","categoria":"Importados y termos","foraneo":false,"estado":"","desc":"Productos importados, de venta exclusiva en usa( Owala, hydrojug, Rhode, saie)","desc_full":"Productos importados, de venta exclusiva en usa( Owala, hydrojug, Rhode, saie)","rango":"$120 – $1,700","stand":"","pagos":"","wa":"527226312630","ig":"kikashopire"},
+  {"id":"E-018","nombre":"CONDEtalle/Jime's cupcakes","categoria":"Joyería y accesorios","foraneo":false,"estado":"","desc":"Joyería artesanal y postres caseros","desc_full":"Joyería artesanal y postres caseros","rango":"$30 – $500","stand":"","pagos":"","wa":"525521130580","ig":"condetalle_artesanias"},
+  {"id":"E-019","nombre":"Japicases","categoria":"Joyería y accesorios","foraneo":false,"estado":"","desc":"Cases pintados a mano y personalizados con charms, tarjeteros, straps y mas accesorios para celular.","desc_full":"Cases pintados a mano y personalizados con charms, tarjeteros, straps y mas accesorios para celular.","rango":"$200 – $750","stand":"","pagos":"","wa":"525539337239","ig":"japicases"},
+  {"id":"E-020","nombre":"Pearlagom","categoria":"Joyería y accesorios","foraneo":false,"estado":"","desc":"Joyería en chapa de oro y acero inoxidable + Servicio de grabado láser","desc_full":"Joyería en chapa de oro y acero inoxidable + Servicio de grabado láser","rango":"$100 – $550","stand":"","pagos":"","wa":"525535232854","ig":"pearlagom"},
+  {"id":"E-021","nombre":"Tetei Kamari","categoria":"Belleza y cuidado","foraneo":false,"estado":"","desc":"Dupes/inspiraciones de perfumes; pines y llaveros de libros","desc_full":"Dupes/inspiraciones de perfumes; pines y llaveros de libros","rango":"$199 – $649","stand":"","pagos":"","wa":"527291143499","ig":""},
+  {"id":"E-022","nombre":"Reurbanica","categoria":"Moda","foraneo":false,"estado":"","desc":"Ropa para todo tipo de persiana","desc_full":"Ropa para todo tipo de persiana","rango":"$750 – $10,000","stand":"","pagos":"","wa":"525520571660","ig":"reurbanica"},
+  {"id":"E-023","nombre":"Joyería Viceli","categoria":"Joyería y accesorios","foraneo":false,"estado":"","desc":"Joyería de plata, arracadas, aretes, anillos, cadenas, pulseras, gargantillas etc","desc_full":"Joyería de plata, arracadas, aretes, anillos, cadenas, pulseras, gargantillas etc","rango":"$200 – $6,000","stand":"","pagos":"","wa":"525516903901","ig":"joyeria_viceli"},
+  {"id":"E-024","nombre":"Calcetero","categoria":"Moda","foraneo":false,"estado":"","desc":"Funny Socks de algodón, calentadores, medias","desc_full":"Funny Socks de algodón, calentadores, medias","rango":"$120","stand":"","pagos":"","wa":"525534162004","ig":"calcetero.mx"},
+  {"id":"E-025","nombre":"Sweet Alfajores Artesanales","categoria":"Postres y pan","foraneo":false,"estado":"","desc":"Deliciosos alfajores artesanales, de receta familiar argentina y brownies con nuez","desc_full":"Deliciosos alfajores artesanales, de receta familiar argentina y brownies con nuez","rango":"$50 – $395","stand":"","pagos":"","wa":"525535500107","ig":"sweet_alfajores.artesanales"},
+  {"id":"E-026","nombre":"Joyería Auguri","categoria":"Joyería y accesorios","foraneo":false,"estado":"","desc":"Joyería de laminado de oro de 18 kilates y laminado de rodio, materiales hipo alérgicos, sin niquel, ni cobre","desc_full":"Joyería de laminado de oro de 18 kilates y laminado de rodio, materiales hipo alérgicos, sin niquel, ni cobre","rango":"$140 – $650","stand":"","pagos":"","wa":"525554028737","ig":"auguri_poniente"},
+  {"id":"E-027","nombre":"Bony’s Store papelería","categoria":"Arte y papelería","foraneo":false,"estado":"","desc":"Venta de productos de papelería y personalización","desc_full":"Venta de productos de papelería y personalización","rango":"$15 – $699","stand":"","pagos":"","wa":"525568058431","ig":"bonysstore"},
+  {"id":"E-028","nombre":"Aura","categoria":"Joyería y accesorios","foraneo":false,"estado":"","desc":"Joyería waterproof","desc_full":"Joyería waterproof","rango":"$80 – $400","stand":"","pagos":"","wa":"522215983208","ig":"auraa.joyeriamx"},
+  {"id":"E-029","nombre":"Joma","categoria":"Joyería y accesorios","foraneo":false,"estado":"","desc":"Joyería única elaborada a mano de minerales","desc_full":"Joyería única elaborada a mano de minerales","rango":"$45 – $2,800","stand":"","pagos":"","wa":"525541383261","ig":""},
+  {"id":"E-030","nombre":"Lika Manualidades","categoria":"Moda","foraneo":false,"estado":"","desc":"\"Venta de productos hechos a mano, la mayoría es de tela, muñequeria como ositos en diferentes diseños de telas, así como los Ositos Memory Bear, manteles, juegos de…","desc_full":"\"Venta de productos hechos a mano, la mayoría es de tela, muñequeria como ositos en diferentes diseños de telas, así como los Ositos Memory Bear, manteles, juegos de baño y cocina en tela y pintados a mano y en diferentes diseños de tela, chamarras de mezclilla pintadas a mano, bolsas ecológicas, tote bag, nesecer, cosmetiqueras en diferentes diseños y tamaños, porta cel, fundas para ipad y Lap, etc. etc. Todo es totalmente hecho a mano, hechos con amor 🩷 \"","rango":"$85 – $800","stand":"","pagos":"","wa":"527293775956","ig":""},
+  {"id":"E-031","nombre":"Sherim","categoria":"Joyería y accesorios","foraneo":false,"estado":"","desc":"Joyería, lentes de sol y Skincare coreano","desc_full":"Joyería, lentes de sol y Skincare coreano","rango":"$150 – $850","stand":"","pagos":"","wa":"525567523903","ig":"sherim_jewelry"},
+  {"id":"E-032","nombre":"Clementina Shop","categoria":"Importados y termos","foraneo":false,"estado":"","desc":"Termos Owala, Brumate, Hydrojug ORIGINALES y cositas de Usa, jelly cats","desc_full":"Termos Owala, Brumate, Hydrojug ORIGINALES y cositas de Usa, jelly cats","rango":"$300 – $2,000","stand":"","pagos":"","wa":"524428808178","ig":"clementina_shopss"},
+  {"id":"E-033","nombre":"SportStyle","categoria":"Moda","foraneo":false,"estado":"","desc":"Ropa deportiva enfocada en mujeres","desc_full":"Ropa deportiva enfocada en mujeres","rango":"$550 – $850","stand":"","pagos":"","wa":"525524988472","ig":"sportstyle_fitness"},
+  {"id":"E-034","nombre":"GRISAIA","categoria":"Joyería y accesorios","foraneo":false,"estado":"","desc":"Somos una Empresa Mexicana especializadas en cristales, piedras, perlas y dijes de más de 30 países y el diseño se realiza en plata .925 y chapa de oro 18k. Nuestro…","desc_full":"Somos una Empresa Mexicana especializadas en cristales, piedras, perlas y dijes de más de 30 países y el diseño se realiza en plata .925 y chapa de oro 18k. Nuestro distintivo es el diseño minimalista.","rango":"$150 – $750","stand":"","pagos":"","wa":"525532779690","ig":"gris.aia"},
+  {"id":"E-035","nombre":"Peluches tu-tuy","categoria":"Juguetes y coleccionables","foraneo":false,"estado":"","desc":"Peluches, llaveros y bolsas sorpresa","desc_full":"Peluches, llaveros y bolsas sorpresa","rango":"$70 – $650","stand":"","pagos":"","wa":"527226168132","ig":"peluchestu_tuy"},
+  {"id":"E-036","nombre":"Lore Topete Joyería","categoria":"Joyería y accesorios","foraneo":false,"estado":"","desc":"Joyería de plata y acero inoxidable","desc_full":"Joyería de plata y acero inoxidable","rango":"$200 – $2,900","stand":"","pagos":"","wa":"525525603652","ig":"loretopete_joyeria"},
+  {"id":"E-037","nombre":"Scentsy","categoria":"Hogar y velas","foraneo":false,"estado":"","desc":"Warmers aromaticos y difusores","desc_full":"Warmers aromaticos y difusores","rango":"","stand":"","pagos":"","wa":"527441384814","ig":""},
+  {"id":"E-038","nombre":"Desereta","categoria":"Postres y pan","foraneo":false,"estado":"","desc":"Dulcería gourmet: gomitas enchiladas, semillas cubiertas con chocolate, churritos de amaranto, mango deshidratado natural.","desc_full":"Dulcería gourmet: gomitas enchiladas, semillas cubiertas con chocolate, churritos de amaranto, mango deshidratado natural.","rango":"$27 – $197","stand":"","pagos":"","wa":"525544679157","ig":"deseretamx"},
+  {"id":"E-039","nombre":"Gida cookies","categoria":"Postres y pan","foraneo":false,"estado":"","desc":"Galletas estilo americano caseras","desc_full":"Galletas estilo americano caseras","rango":"$45 – $55","stand":"","pagos":"","wa":"525543641448","ig":"gida.cookies"},
+  {"id":"E-040","nombre":"Edicion Geek Mx","categoria":"Arte y papelería","foraneo":false,"estado":"","desc":"Lienzos Paint by Numbers & Paint by Diamonds, rompecabezas, peluches aurora y tazas personalizadas","desc_full":"Lienzos Paint by Numbers & Paint by Diamonds, rompecabezas, peluches aurora y tazas personalizadas","rango":"$100 – $680","stand":"","pagos":"","wa":"525547350907","ig":"ediciongeek_mx"},
+  {"id":"E-041","nombre":"Pepetines","categoria":"Juguetes y coleccionables","foraneo":false,"estado":"","desc":"Juguetes artesanales hechos a mano: conejos, gatos, perros, changos, dinosaurios y unicornios creados a partir de calcetines. Cada pieza es única e irrepetible.","desc_full":"Juguetes artesanales hechos a mano: conejos, gatos, perros, changos, dinosaurios y unicornios creados a partir de calcetines. Cada pieza es única e irrepetible.","rango":"$170 – $350","stand":"","pagos":"","wa":"525610900974","ig":"pepetinesmex"},
+  {"id":"E-042","nombre":"Mina Joyeria","categoria":"Joyería y accesorios","foraneo":false,"estado":"","desc":"Joyería, charm bar, brazaletes permanentes y personalización de accesorios.","desc_full":"Joyería, charm bar, brazaletes permanentes y personalización de accesorios.","rango":"$50 – $400","stand":"","pagos":"","wa":"525564239839","ig":"minajoyeria"},
+  {"id":"E-043","nombre":"Tessalia","categoria":"Joyería y accesorios","foraneo":false,"estado":"","desc":"Joyería en acero inoxidable para mujer","desc_full":"Joyería en acero inoxidable para mujer","rango":"$200 – $600","stand":"","pagos":"","wa":"525551828917","ig":"tessaliajoyeria"},
+  {"id":"E-044","nombre":"Asul Accesorios","categoria":"Joyería y accesorios","foraneo":false,"estado":"","desc":"Bolsas hechas 100% en México, bandanas, cosméticos en tendencia y joyería","desc_full":"Bolsas hechas 100% en México, bandanas, cosméticos en tendencia y joyería","rango":"$200 – $800","stand":"","pagos":"","wa":"527121018313","ig":"asul_accesorios"},
+  {"id":"E-045","nombre":"Coolkases","categoria":"Arte y papelería","foraneo":false,"estado":"","desc":"Cases y accesorios pintados a mano","desc_full":"Cases y accesorios pintados a mano","rango":"$150 – $1,100","stand":"","pagos":"","wa":"524424400385","ig":"coolkases.mx"},
+  {"id":"E-046","nombre":"D’LOYA DISEÑO EXCLUSIVO","categoria":"Moda","foraneo":false,"estado":"","desc":"D’LOYA — El Legado que llevas contigo D’LOYA es una marca mexicana de marroquinería artesanal que nace de una historia familiar y de la pasión por crear piezas únicas…","desc_full":"D’LOYA — El Legado que llevas contigo D’LOYA es una marca mexicana de marroquinería artesanal que nace de una historia familiar y de la pasión por crear piezas únicas que trascienden generaciones. Bajo el concepto “El Legado D’LOYA”, cada diseño busca celebrar la autenticidad, la libertad y la belleza de llevar contigo algo que tiene una historia. Nuestras bolsas son elaboradas artesanalmente con 100% piel de vaca, seleccionada por su calidad, textura y carácter. Cada pieza posee detalles y tonalidades propias de la piel natural, haciendo que no existan dos bolsas exactamente iguales. Contamos con diseños de inspiración bohemia, elegante y atemporal, pensados para mujeres que buscan accesorios con personalidad, calidad y esencia propia. Nuestra propuesta combina la tradición de la artesanía mexicana con diseños contemporáneos y funcionales. En D’LOYA creemos que una bolsa no es solamente un accesorio: es una pieza que acompaña tu historia, refleja quién eres y se convierte en parte de tu propio legado.","rango":"$390 – $3,200","stand":"","pagos":"","wa":"525512022617","ig":"de.loya"},
+  {"id":"E-047","nombre":"SHULA MEXICO","categoria":"Joyería y accesorios","foraneo":false,"estado":"","desc":"Somos un joyería con excelente calidad y precios accesibles","desc_full":"Somos un joyería con excelente calidad y precios accesibles","rango":"$99 – $350","stand":"","pagos":"","wa":"525619883358","ig":"shulamexico"},
+  {"id":"E-048","nombre":"Astralia Joyería","categoria":"Joyería y accesorios","foraneo":false,"estado":"","desc":"Joyería en tendencia de acero inoxidable como aretes, pulseras, anillos, collares, pulseras italianos, relojes italianos, piezas de piercing, relojes, dijes, charms…","desc_full":"Joyería en tendencia de acero inoxidable como aretes, pulseras, anillos, collares, pulseras italianos, relojes italianos, piezas de piercing, relojes, dijes, charms italianos, brazaletes, joyería chunky, pinzas de cabello etc.","rango":"$50 – $350","stand":"","pagos":"","wa":"527226477662","ig":"astralia.joyeria"},
+  {"id":"E-049","nombre":"Bonita para ti","categoria":"Moda","foraneo":false,"estado":"","desc":"Maquillaje / Ropa deportiva","desc_full":"Maquillaje / Ropa deportiva","rango":"$50 – $600","stand":"","pagos":"","wa":"527222946355","ig":"bonitaparati.mx"},
+  {"id":"E-050","nombre":"MT 17 CAFE ARTESANAL","categoria":"Bebidas","foraneo":false,"estado":"","desc":"Café tostado, en grano y molido, mermelada de café, fresa y zarzamora, velas aromáticas, confitería, jabones y exfoliantes de café.","desc_full":"Café tostado, en grano y molido, mermelada de café, fresa y zarzamora, velas aromáticas, confitería, jabones y exfoliantes de café.","rango":"$55 – $320","stand":"","pagos":"","wa":"527226474477","ig":"mt17cafeartesanal"},
+  {"id":"E-051","nombre":"Farmasi Productos Turcos","categoria":"Belleza y cuidado","foraneo":false,"estado":"","desc":"Nutriplus (suplementos), cosméticos veganos, perfumería y skin care","desc_full":"Nutriplus (suplementos), cosméticos veganos, perfumería y skin care","rango":"$110 – $1,500","stand":"","pagos":"","wa":"525523113303","ig":""},
+  {"id":"E-052","nombre":"Lily's bakery","categoria":"Postres y pan","foraneo":false,"estado":"","desc":"Pan de muerto y chocolate caliente","desc_full":"Pan de muerto y chocolate caliente","rango":"$20 – $400","stand":"","pagos":"","wa":"525527237454","ig":"lilysbakery_mx"},
+  {"id":"E-053","nombre":"We are María María","categoria":"Joyería y accesorios","foraneo":false,"estado":"","desc":"Joyería católica","desc_full":"Joyería católica","rango":"$290 – $1,900","stand":"","pagos":"","wa":"522229543294","ig":""},
+  {"id":"E-054","nombre":"Holy Mustard","categoria":"Moda","foraneo":false,"estado":"","desc":"Articulos religiosos y moda católica","desc_full":"Articulos religiosos y moda católica","rango":"$10 – $1,000","stand":"","pagos":"","wa":"525512929564","ig":""},
+  {"id":"E-055","nombre":"Accsmels","categoria":"Joyería y accesorios","foraneo":false,"estado":"","desc":"Joyería","desc_full":"Joyería","rango":"$149 – $399","stand":"","pagos":"","wa":"525551983520","ig":"accsmels"},
+  {"id":"E-056","nombre":"Mia Gaitán Skincare","categoria":"Belleza y cuidado","foraneo":false,"estado":"","desc":"Productos Mexicanos de Bio Cosmética Vegana de Autor, hechos con detalle de manera Artesanal para el cuidado de la piel con protocolos completos de Skincare faciales…","desc_full":"Productos Mexicanos de Bio Cosmética Vegana de Autor, hechos con detalle de manera Artesanal para el cuidado de la piel con protocolos completos de Skincare faciales, corporales y capilares, con activos de alta gama.","rango":"$90 – $590","stand":"","pagos":"","wa":"525513640358","ig":""},
+  {"id":"E-057","nombre":"Joyils","categoria":"Joyería y accesorios","foraneo":false,"estado":"","desc":"Joyería en acero inoxidable","desc_full":"Joyería en acero inoxidable","rango":"$50 – $350","stand":"","pagos":"","wa":"527224682766","ig":"ilishopmx"},
+  {"id":"E-058","nombre":"Bolita Pet","categoria":"Otros","foraneo":false,"estado":"","desc":"Mascotas: collares personalizados para mascota.","desc_full":"Mascotas: collares personalizados para mascota.","rango":"$250 – $600","stand":"","pagos":"","wa":"525572247807","ig":"bolitapet.mx"},
+  {"id":"E-059","nombre":"Arty Naykary & Culture","categoria":"Moda","foraneo":false,"estado":"","desc":"Arty Naykary & Culture es un proyecto de arte portable: chamarras de mezclilla intervenidas y pintadas a mano por artistas mexicanos, donde cada pieza es única e…","desc_full":"Arty Naykary & Culture es un proyecto de arte portable: chamarras de mezclilla intervenidas y pintadas a mano por artistas mexicanos, donde cada pieza es única e irrepetible. Partimos de una convicción central que el arte no debe permanecer confinado a la pared de un museo, sino habitar el cuerpo y caminar con quien lo porta. Nuestras colecciones reinterpretan, con rigor y respeto, obras de referentes como Remedios Varo, Leonora Carrington, Frida Kahlo y Salvador Dalí, además de motivos derivados de cosmovisiones culturales mexicanas, trasladados directamente sobre la prenda mediante técnica pictórica artesanal. El proyecto se sostiene sobre un compromiso de trabajo colaborativo y trato justo: un equipo de cinco pintores y dos costureras mexicanas da forma a cada pieza, a lo que se suman colaboraciones en telas, encajes y bordados que amplían el lenguaje textil de la marca. Contamos también con piezas de impresión digital, pensadas para ofrecer un punto de entrada más accesible sin renunciar a la intención artística que define el proyecto.","rango":"$800 – $4,000","stand":"","pagos":"","wa":"525548036746","ig":"artynaykaryculture"},
+  {"id":"E-060","nombre":"A&M Shopping Perfumería Original / papel arroz","categoria":"Belleza y cuidado","foraneo":false,"estado":"","desc":"Perfumes y sets originales","desc_full":"Perfumes y sets originales","rango":"$20 – $3,500","stand":"","pagos":"","wa":"525616372511","ig":""}
+];
+/* EXPOSITORES:fim */
 
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const norm=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+const norm=s=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
 const MENORES=new Set(["de","del","la","las","el","los","y","e","en"]);
-const sigla=n=>n.split(/\s+/).filter(w=>!MENORES.has(w.toLowerCase())).slice(0,2).map(w=>w[0]).join("").toUpperCase();
-const esForaneo=n=>n.estado!=="";
+const sigla=n=>n.split(/[\s/]+/).filter(w=>/^\p{L}/u.test(w)&&!MENORES.has(w.toLowerCase())).slice(0,2).map(w=>w[0]).join("").toUpperCase();
+const esForaneo=n=>n.foraneo;
+// Sem estados na folha, a insígnia diz "Foráneo"; com estado, mostra-o.
+const origen=n=>n.estado||"Foráneo";
+
+const ESTADOS=[...new Set(EXPOSITORES.map(n=>n.estado).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
+const CATEGORIAS=[...new Set(EXPOSITORES.map(n=>n.categoria))].sort((a,b)=>(a==="Otros")-(b==="Otros")||a.localeCompare(b,"es"));
 
 // Ícones de contato, desenhados com primitivas
 const ICONO_WA='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12.5" cy="11.5" r="8.5" fill="#fff"/><path d="M6.2 16.8 3.5 21l4.9-1.6z" fill="#fff"/><path d="M9.3 7.4c.3-.3.8-.2 1 .1l1 1.8c.2.3.1.7-.2 1l-.6.6c.6 1.2 1.5 2.1 2.7 2.7l.6-.6c.3-.3.7-.3 1-.2l1.8 1c.4.2.4.7.1 1l-.8.8c-.6.6-1.5.8-2.3.5-2.3-.9-4.1-2.7-5-5-.3-.8-.1-1.7.5-2.3z" fill="#04893D"/></svg>';
@@ -289,7 +337,7 @@ const ICONO_X='<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true
 
 const tile=(n,conStand)=>{
   const p=patron(n.id);
-  return `<span class="tile">${p.svg}<span class="sigla" style="color:${p.tinta}" aria-hidden="true">${esc(sigla(n.nombre))}</span>${esForaneo(n)?`<span class="etq-origen">${flecha("currentColor")}${esc(n.estado)}</span>`:""}${conStand?`<span class="etq-stand">Stand ${esc(n.stand)}</span>`:""}</span>`;
+  return `<span class="tile">${p.svg}<span class="sigla" style="color:${p.tinta}" aria-hidden="true">${esc(sigla(n.nombre))}</span>${esForaneo(n)?`<span class="etq-origen">${flecha("currentColor")}${esc(origen(n))}</span>`:""}${conStand&&n.stand?`<span class="etq-stand">Stand ${esc(n.stand)}</span>`:""}</span>`;
 };
 
 // Estado dos filtros — acumulativos sobre a mesma lista
@@ -302,16 +350,16 @@ function coincide(n){
   if(filtro.foraneos&&!esForaneo(n))return false;
   if(filtro.estado&&n.estado!==filtro.estado)return false;
   if(filtro.q){
-    const texto=norm([n.nombre,n.desc,n.categoria,n.estado,n.stand,...n.productos].join(" "));
+    const texto=norm([n.nombre,n.desc_full,n.categoria,n.estado,n.stand,n.ig].join(" "));
     if(!norm(filtro.q).split(/\s+/).filter(Boolean).every(t=>texto.includes(t)))return false;
   }
   return true;
 }
 
 function render(){
-  const lista=NEGOCIOS.filter(coincide);
-  contador.textContent=`${lista.length} de ${TOTAL} negocios`;
-  grade.innerHTML=lista.length?lista.map(n=>`<button type="button" class="tarjeta" data-id="${n.id}" aria-label="${esc(n.nombre)}${esForaneo(n)?", foráneo de "+esc(n.estado):""}, stand ${esc(n.stand)}">${tile(n,true)}<span class="cuerpo"><span class="nombre">${esc(n.nombre)}</span><span class="desc">${esc(n.desc)}</span><span class="pie-tarjeta"><span class="cat">${esc(n.categoria)}</span><span class="rango">${esc(n.rango)}</span></span></span></button>`).join("")
+  const lista=EXPOSITORES.filter(coincide);
+  contador.textContent=`${lista.length} de ${EXPOSITORES.length} negocios`;
+  grade.innerHTML=lista.length?lista.map(n=>`<button type="button" class="tarjeta" data-id="${n.id}" aria-label="${esc(n.nombre)}${esForaneo(n)?(n.estado?", foráneo de "+esc(n.estado):", foráneo"):""}${n.stand?", stand "+esc(n.stand):""}">${tile(n,true)}<span class="cuerpo"><span class="nombre">${esc(n.nombre)}</span><span class="desc">${esc(n.desc)}</span><span class="pie-tarjeta"><span class="cat">${esc(n.categoria)}</span>${n.rango?`<span class="rango">${esc(n.rango)}</span>`:""}</span></span></button>`).join("")
     :`<div class="vacio"><p>Ningún negocio coincide con tu búsqueda.</p><button type="button" data-limpiar>Limpiar filtros</button></div>`;
 }
 
@@ -321,26 +369,21 @@ function pintarChips(){
 }
 
 function abrir(id){
-  const n=NEGOCIOS.find(x=>x.id===id);if(!n)return;
-  const wa=`https://wa.me/${n.wa}?text=${encodeURIComponent(MENSAJE)}`;
+  const n=EXPOSITORES.find(x=>x.id===id);if(!n)return;
+  // Nenhum botão sem destino; se só houver um, ocupa a largura toda.
+  const enlaces=[
+    n.wa&&`<a class="wa" href="https://wa.me/${n.wa}?text=${encodeURIComponent(MENSAJE)}" target="_blank" rel="noopener">${ICONO_WA}WhatsApp</a>`,
+    n.ig&&`<a class="ig" href="https://instagram.com/${encodeURIComponent(n.ig)}" target="_blank" rel="noopener">${ICONO_IG}@${esc(n.ig)}</a>`
+  ].filter(Boolean);
+  const meta=[["Stand",n.stand],["Precios",n.rango],["Categoría",n.categoria],["Pagos",n.pagos]].filter(([,v])=>v);
   hoja.innerHTML=`<button type="button" class="cerrar" data-cerrar aria-label="Cerrar">${ICONO_X}</button>
     ${tile(n,false)}
     <div class="ficha-cuerpo">
       <h2 id="ficha-nombre">${esc(n.nombre)}</h2>
-      <span class="pildora">${esForaneo(n)?`${flecha("currentColor")}Foráneo · ${esc(n.estado)}`:"Local"}</span>
-      <p class="texto">${esc(n.desc)}</p>
-      <h3>Lo que trae</h3>
-      <ul class="trae">${n.productos.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>
-      <dl class="meta">
-        <div><dt>Stand</dt><dd>${esc(n.stand)}</dd></div>
-        <div><dt>Precios</dt><dd>${esc(n.rango)}</dd></div>
-        <div><dt>Categoría</dt><dd>${esc(n.categoria)}</dd></div>
-        <div><dt>Pagos</dt><dd>${esc(n.pagos)}</dd></div>
-      </dl>
-      <div class="contacto">
-        <a class="wa" href="${wa}" target="_blank" rel="noopener">${ICONO_WA}WhatsApp</a>
-        <a class="ig" href="https://instagram.com/${encodeURIComponent(n.ig)}" target="_blank" rel="noopener">${ICONO_IG}@${esc(n.ig)}</a>
-      </div>
+      <span class="pildora">${esForaneo(n)?`${flecha("currentColor")}Foráneo${n.estado?" · "+esc(n.estado):""}`:"Local"}</span>
+      <p class="texto">${esc(n.desc_full)}</p>
+      <dl class="meta">${meta.map(([k,v])=>`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
+      ${enlaces.length?`<div class="contacto${enlaces.length===1?" uno":""}">${enlaces.join("")}</div>`:""}
     </div>`;
   hoja.scrollTop=0;
   ficha.showModal();
@@ -355,7 +398,13 @@ function limpiar(){
 // Montagem
 document.querySelectorAll("[data-rafaga]").forEach(el=>{el.innerHTML=rafaga()});
 document.querySelector("[data-flecha-leyenda]").insertAdjacentHTML("afterbegin",flecha("currentColor"));
-[...new Set(NEGOCIOS.filter(esForaneo).map(n=>n.estado))].sort((a,b)=>a.localeCompare(b,"es")).forEach(e=>selEstado.add(new Option(e,e)));
+const dato=(k,v)=>{document.querySelector(`[data-dato="${k}"]`).textContent=v};
+dato("total",EXPOSITORES.length);
+dato("foraneos",EXPOSITORES.filter(esForaneo).length);
+dato("estados",ESTADOS.length);
+document.querySelector('[data-dato-li="estados"]').hidden=!ESTADOS.length;
+ESTADOS.forEach(e=>selEstado.add(new Option(e,e)));
+selEstado.hidden=!ESTADOS.length;
 pintarChips();
 render();
 

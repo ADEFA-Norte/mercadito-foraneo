@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mercadito Foráneo · ADEFA</title>
+<meta name="description" content="Catálogo del Mercadito Foráneo de ADEFA. 30 de septiembre y 1 de octubre de 2026, explanada central de la Universidad Anáhuac México Norte.">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Zilla+Slab:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --acento:#BF3912;
+  --sistema:#07697C;
+  --negro:#000;
+  --gris:#545C5E;
+  --linea:#D6DADB;
+  --fondo:#F4F7F8;
+  --papel:#fff;
+  --zilla:"Zilla Slab",Georgia,serif;
+  --jost:"Jost",system-ui,-apple-system,sans-serif;
+  --gutter:16px;
+}
+*,*::before,*::after{box-sizing:border-box;border-radius:0}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--fondo);color:var(--negro);font:400 16px/1.45 var(--jost);-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+a{color:inherit}
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--sistema);outline-offset:2px}
+.envoltura{max-width:1200px;margin:0 auto;padding:0 var(--gutter)}
+.flecha{display:inline-block;height:13px;width:7.7px;flex:none;vertical-align:-1px}
+
+/* Header */
+.cabecera{position:sticky;top:0;z-index:30;height:60px;background:var(--papel);border-bottom:1px solid var(--linea)}
+.cabecera .envoltura{height:100%;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.marca{display:flex;align-items:center;gap:10px;text-decoration:none;font:700 20px/1 var(--zilla);letter-spacing:-.3px}
+.marca .rafaga{width:28px;height:28px;flex:none}
+.cabecera nav a{font:500 14px/1 var(--jost);text-decoration:none;padding:10px 0;border-bottom:2px solid var(--acento)}
+
+/* Hero */
+.hero{position:relative;overflow:hidden;background:var(--papel);border-bottom:1px solid var(--linea)}
+.hero .marca-agua{position:absolute;z-index:0;top:50%;right:0;width:min(640px,120vw);aspect-ratio:1;transform:translate(34%,-50%);opacity:.13;pointer-events:none}
+.hero .envoltura{position:relative;z-index:1;padding-top:44px;padding-bottom:40px}
+.hero .antetitulo{margin:0 0 14px;font:500 13px/1.3 var(--jost);letter-spacing:.08em;text-transform:uppercase;color:var(--acento)}
+.hero h1{margin:0;font:700 clamp(40px,8.4vw,76px)/.95 var(--zilla);letter-spacing:-1.8px;max-width:9ch}
+.hero .sub{margin:20px 0 0;max-width:34em;font:300 18px/1.45 var(--jost);color:var(--gris)}
+.datos{list-style:none;margin:32px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,1fr);gap:20px 16px;max-width:760px}
+.datos li{border-top:2px solid var(--negro);padding-top:10px}
+.datos b{display:block;font:700 30px/1 var(--zilla);letter-spacing:-.5px}
+.datos span{display:block;margin-top:4px;font:400 14px/1.3 var(--jost);color:var(--gris)}
+@media (min-width:700px){.datos{grid-template-columns:repeat(4,1fr)}.hero .envoltura{padding-top:72px;padding-bottom:64px}}
+
+/* Filtros */
+.filtros{position:sticky;top:60px;z-index:20;background:var(--fondo);border-bottom:1px solid var(--linea)}
+.filtros .envoltura{padding-top:12px;padding-bottom:10px;display:grid;gap:10px}
+.fila{display:flex;gap:8px;align-items:center}
+.busca{flex:1 1 auto;min-width:0;height:44px;padding:0 12px;border:1px solid var(--linea);background:var(--papel);-webkit-appearance:none;appearance:none}
+.busca::placeholder{color:var(--gris)}
+.estados{flex:0 0 auto;max-width:44%;height:44px;padding:0 32px 0 12px;border:1px solid var(--linea);background:var(--papel) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23000'/%3E%3C/svg%3E") no-repeat right 12px center;-webkit-appearance:none;appearance:none;text-overflow:ellipsis}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1 * var(--gutter));padding:2px var(--gutter)}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border:1px solid var(--linea);background:var(--papel);font:400 14px/1 var(--jost);cursor:pointer;white-space:nowrap}
+.chip .flecha{color:var(--acento)}
+.chip[aria-pressed="true"]{background:var(--acento);border-color:var(--acento);color:#fff}
+.chip[aria-pressed="true"] .flecha{color:#fff}
+.chip.foraneo{margin-right:6px}
+.pie-filtros{display:flex;justify-content:space-between;align-items:center;gap:12px;font:400 13px/1.3 var(--jost);color:var(--gris)}
+.leyenda{display:inline-flex;align-items:center;gap:6px}
+.leyenda .flecha{color:var(--acento)}
+.contador{font-weight:500;color:var(--negro);white-space:nowrap}
+
+/* Grade */
+main .envoltura{padding-top:20px;padding-bottom:56px}
+.grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:1px;background:var(--linea);border:1px solid var(--linea)}
+.tarjeta{display:flex;flex-direction:column;width:100%;margin:0;padding:0;border:0;background:var(--papel);text-align:left;cursor:pointer}
+.tarjeta span{display:block}
+.tile{position:relative;overflow:hidden;aspect-ratio:4/5;width:100%}
+.tile>svg,.tile>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.sigla{position:absolute;inset:0;display:flex!important;align-items:center;justify-content:center;font:700 64px/1 var(--zilla);letter-spacing:-1px}
+.etq-stand{position:absolute;left:0;bottom:0;padding:6px 10px;background:var(--papel);font:500 12px/1 var(--jost);letter-spacing:.04em}
+.etq-origen{position:absolute;left:0;top:0;display:flex!important;align-items:center;gap:6px;padding:7px 10px;background:var(--papel);border-right:1px solid var(--linea);border-bottom:1px solid var(--linea);font:600 12.5px/1 var(--zilla)}
+.etq-origen .flecha{color:var(--acento)}
+.cuerpo{flex:1;display:flex!important;flex-direction:column;padding:14px 14px 12px}
+.nombre{font:700 19px/1.15 var(--zilla);letter-spacing:-.2px}
+.desc{margin-top:6px;font:300 14px/1.4 var(--jost);color:var(--gris);display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pie-tarjeta{margin-top:auto;padding-top:12px;display:flex!important;justify-content:space-between;gap:8px;font:400 13px/1.2 var(--jost)}
+.pie-tarjeta .cat{color:var(--gris)}
+.pie-tarjeta .rango{font-weight:500;white-space:nowrap}
+.tarjeta:hover .nombre{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+.vacio{grid-column:1/-1;background:var(--papel);padding:48px 20px;text-align:center}
+.vacio p{margin:0 0 16px;font:600 20px/1.3 var(--zilla)}
+.vacio button{height:40px;padding:0 16px;border:1px solid var(--negro);background:var(--papel);cursor:pointer}
+
+/* Ficha */
+.ficha{padding:0;border:0;background:transparent;max-width:none;max-height:none;margin:0;width:100%;inset:auto 0 0 0;color:var(--negro)}
+.ficha::backdrop{background:rgba(0,0,0,.55)}
+.hoja{background:var(--papel);max-height:92vh;max-height:92dvh;overflow-y:auto;overscroll-behavior:contain;position:relative;animation:subir .24s ease-out}
+.cerrar{position:absolute;z-index:2;top:10px;right:10px;width:40px;height:40px;border:0;background:var(--papel);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.ficha .tile{aspect-ratio:16/9}
+.ficha .sigla{font-size:72px}
+.ficha-cuerpo{padding:20px var(--gutter) calc(20px + env(safe-area-inset-bottom))}
+.ficha h2{margin:0;font:700 30px/1.05 var(--zilla);letter-spacing:-.6px}
+.pildora{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:6px 10px;border:1px solid var(--linea);font:600 13px/1 var(--zilla)}
+.pildora .flecha{color:var(--acento)}
+.ficha .texto{margin:14px 0 0;font:300 16px/1.5 var(--jost)}
+.ficha h3{margin:22px 0 8px;font:600 16px/1 var(--zilla)}
+.trae{list-style:none;margin:0;padding:0;border-top:1px solid var(--linea)}
+.trae li{padding:9px 0;border-bottom:1px solid var(--linea);font:400 15px/1.35 var(--jost)}
+.meta{margin:22px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--linea);border:1px solid var(--linea)}
+.meta div{background:var(--papel);padding:10px 12px}
+.meta dt{font:400 12px/1.2 var(--jost);color:var(--gris);text-transform:uppercase;letter-spacing:.06em}
+.meta dd{margin:4px 0 0;font:500 15px/1.3 var(--jost)}
+.contacto{margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.contacto a{display:flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:0 10px;border:0;text-decoration:none;font:500 15px/1.1 var(--jost);color:#fff;text-align:center;overflow-wrap:anywhere}
+.contacto svg{width:20px;height:20px;flex:none}
+.wa{background:#04893D;color:#fff}
+.ig{background:linear-gradient(135deg,#DD2A7B 0%,#8134AF 55%,#515BD4 100%);color:#fff}
+@keyframes subir{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+@media (min-width:700px){
+  .ficha{inset:0;margin:auto;width:min(600px,calc(100% - 32px))}
+  .hoja{max-height:88vh;animation-name:aparecer}
+  .ficha-cuerpo{padding:24px 28px 28px}
+  .ficha h2{font-size:36px}
+}
+@keyframes aparecer{from{transform:scale(.97);opacity:0}to{transform:none;opacity:1}}
+
+/* Rodapé */
+.rodape{background:var(--negro);color:#fff}
+.rodape .envoltura{padding-top:40px;padding-bottom:calc(40px + env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr;gap:24px}
+.rodape h2{margin:0 0 6px;font:600 17px/1.2 var(--zilla)}
+.rodape p{margin:0;font:300 14px/1.5 var(--jost);color:#C9CFD1}
+.rodape a{color:#fff}
+.rodape .firma{display:flex;align-items:center;gap:10px;grid-column:1/-1;padding-top:20px;border-top:1px solid #2A2E2F;font:700 18px/1 var(--zilla)}
+.rodape .firma .rafaga{width:24px;height:24px}
+@media (min-width:700px){.rodape .envoltura{grid-template-columns:repeat(4,1fr)}}
+
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+
+<header class="cabecera">
+  <div class="envoltura">
+    <a class="marca" href="#"><span class="rafaga" data-rafaga></span>Mercadito Foráneo</a>
+    <nav><a href="https://www.google.com/maps/search/?api=1&amp;query=Universidad+An%C3%A1huac+M%C3%A9xico+Norte" target="_blank" rel="noopener">Cómo llegar</a></nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="marca-agua" data-rafaga></div>
+  <div class="envoltura">
+    <p class="antetitulo">ADEFA · Anáhuac México Norte</p>
+    <h1>Lo que trajimos de casa</h1>
+    <p class="sub">Comida, moda y arte hechos por estudiantes que vienen de toda la República, y por los de aquí. Dos días en la explanada central, de 10:00 a 18:00.</p>
+    <ul class="datos">
+      <li><b>61</b><span>negocios</span></li>
+      <li><b>15</b><span>foráneos</span></li>
+      <li><b>10</b><span>estados</span></li>
+      <li><b>30 sep</b><span>y 1 de octubre</span></li>
+    </ul>
+  </div>
+</section>
+
+<div class="filtros">
+  <div class="envoltura">
+    <div class="fila">
+      <label class="sr" for="busca">Buscar negocios</label>
+      <input id="busca" class="busca" type="search" placeholder="Buscar tamales, café, aretes…" autocomplete="off">
+      <label class="sr" for="estado">Estado de origen</label>
+      <select id="estado" class="estados"><option value="">Todos los estados</option></select>
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="Filtrar por categoría"></div>
+    <div class="pie-filtros">
+      <span class="leyenda" data-flecha-leyenda>señala a los negocios foráneos</span>
+      <span class="contador" id="contador" aria-live="polite"></span>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="envoltura">
+    <div class="grade" id="grade"></div>
+  </div>
+</main>
+
+<footer class="rodape">
+  <div class="envoltura">
+    <div>
+      <h2>Dónde</h2>
+      <p>Explanada central, Universidad Anáhuac México Norte. Huixquilucan, Edomex. <a href="https://www.google.com/maps/search/?api=1&amp;query=Universidad+An%C3%A1huac+M%C3%A9xico+Norte" target="_blank" rel="noopener">Abrir en el mapa</a></p>
+    </div>
+    <div>
+      <h2>Cuándo</h2>
+      <p>Miércoles 30 de septiembre y jueves 1 de octubre de 2026, de 10:00 a 18:00.</p>
+    </div>
+    <div>
+      <h2>Pagos</h2>
+      <p>Cada negocio indica en su ficha cómo cobra. Trae algo de efectivo por si acaso.</p>
+    </div>
+    <div>
+      <h2>ADEFA</h2>
+      <p>Asociación de Estudiantes Foráneos Anáhuac. Organizamos el Mercadito para que lo de casa llegue hasta acá.</p>
+    </div>
+    <div class="firma"><span class="rafaga" data-rafaga></span>Mercadito Foráneo</div>
+  </div>
+</footer>
+
+<dialog class="ficha" id="ficha" aria-labelledby="ficha-nombre">
+  <div class="hoja" id="hoja"></div>
+</dialog>
+
+<script>
+"use strict";
+
+// Isotipo — vetorizado do logo oficial. 7 raios, 14 peças. Não alterar as cores.
+const BURST='<path d="M39.2,-91.9 32.0,-79.7 22.3,-84.1 19.5,-67.8 44.5,-53.8 57.3,-65.3 47.9,-70.6 54.8,-83.1Z" fill="#CF4924"/><path d="M38.0,-48.8 18.3,-60.0 12.0,-26.6Z" fill="#CF4924"/><path d="M76.4,-31.9 62.0,-25.0 64.5,2.5 81.7,7.5 81.1,-3.8 95.1,-5.3 93.6,-22.5 79.2,-21.9 77.9,-31.9Z" fill="#DA672F"/><path d="M57.3,0.9 54.8,-21.9 24.2,-7.5Z" fill="#DA672F"/><path d="M54.2,33.4 33.9,53.4 40.8,68.1 48.9,61.5 59.2,71.5 71.7,59.6 62.0,49.0 69.8,40.9Z" fill="#D5632A"/><path d="M17.0,14.3 31.1,45.6 47.3,29.3Z" fill="#D5632A"/><path d="M-13.9,58.4 -19.8,74.6 -9.2,75.3 -8.9,89.6 8.6,89.6 8.9,75.6 20.1,74.9 14.5,59.0Z" fill="#E17B30"/><path d="M-0.5,19.3 -11.4,51.2 10.8,51.5 11.4,50.0Z" fill="#E17B30"/><path d="M-54.5,33.4 -69.8,40.9 -62.0,49.0 -71.7,59.6 -59.2,71.5 -49.2,61.2 -40.8,68.1 -34.2,53.4Z" fill="#932224"/><path d="M-17.3,14.7 -47.3,30.0 -30.8,45.3Z" fill="#932224"/><path d="M-76.4,-31.9 -77.9,-31.6 -79.2,-21.6 -92.9,-22.8 -93.9,-20.3 -94.8,-5.3 -81.4,-4.1 -81.7,7.5 -65.1,3.4 -62.3,-25.0Z" fill="#B02F26"/><path d="M-57.3,0.9 -24.5,-7.5 -54.8,-21.6Z" fill="#B02F26"/><path d="M-39.5,-91.9 -54.8,-83.1 -47.6,-70.6 -57.3,-64.7 -44.2,-53.8 -19.5,-67.8 -22.7,-84.4 -32.0,-79.7Z" fill="#C73024"/><path d="M-38.0,-48.8 -12.0,-26.6 -18.3,-60.0Z" fill="#C73024"/>';
+const GLIFO='<path d="M13.9,-58.4 19.8,-74.6 9.2,-75.3 8.9,-89.6 -8.6,-89.6 -8.9,-75.6 -20.1,-74.9 -14.5,-59.0Z"/><path d="M0.5,-19.3 11.4,-51.2 -10.8,-51.5 -11.4,-50.0Z"/>';
+const rafaga=()=>`<svg viewBox="-104 -104 208 208" width="100%" height="100%" aria-hidden="true">${BURST}</svg>`;
+const flecha=c=>`<svg class="flecha" viewBox="-22.1 -91.6 44.0 74.3" aria-hidden="true"><g fill="${c}">${GLIFO}</g></svg>`;
+
+// Rampa OKLCH, 8 passos por luminosidade crescente
+const RAMPA=["#2B1915","#932327","#AA2B1F","#BF3912","#CE4F0E","#DA651B","#E17E36","#F2E8DB"];
+const CORTE=4;
+
+const hash=s=>{let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0}return h};
+const rng=a=>()=>{a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+
+// Substituto da foto. Com foto, troca-se só o <svg> por um <img>.
+function patron(id){
+  const r=rng(hash(id));
+  const i=Math.floor(r()*RAMPA.length);
+  const vecinos=[i-2,i-1,i+1,i+2].filter(k=>k>=0&&k<RAMPA.length).map(k=>RAMPA[k]);
+  const n=4+Math.floor(r()*4);
+  let capas="";
+  for(let k=0;k<n;k++){
+    const c=vecinos[Math.floor(r()*vecinos.length)];
+    const dx=(r()*200-100).toFixed(1);
+    const dy=(r()*200-100).toFixed(1);
+    const a=(r()*360).toFixed(1);
+    const s=(0.45+r()*0.85).toFixed(3);
+    capas+=`<g fill="${c}" transform="translate(${dx},${dy}) rotate(${a}) scale(${s})">${GLIFO}</g>`;
+  }
+  const svg=`<svg viewBox="-110 -110 220 220" preserveAspectRatio="xMidYMid slice" width="100%" height="100%" aria-hidden="true"><rect x="-110" y="-110" width="220" height="220" fill="${RAMPA[i]}"/>${capas}</svg>`;
+  return {svg,tinta:i<CORTE?"#FFFFFF":"#000000"};
+}
+
+const TOTAL=61;
+const CATEGORIAS=["Comida","Postres","Bebidas","Moda","Accesorios","Arte"];
+const MENSAJE="Hola, los vi en el catálogo del Mercadito Foráneo de ADEFA.";
+
+// Um objeto por negócio, espelho de uma linha da planilha. estado vazio = local.
+const NEGOCIOS=[
+  {id:"E-001",nombre:"Tamales de la Abuela Chela",categoria:"Comida",estado:"Veracruz",desc:"Tamales envueltos en hoja de plátano y zacahuil por porción, con la receta de la Huasteca veracruzana.",productos:["Tamal de hoja de plátano con pollo","Zacahuil por porción","Champurrado de piloncillo"],rango:"$35 – $120",stand:"A-01",pagos:"Efectivo, transferencia",wa:"522291847362",ig:"tamales.chela"},
+  {id:"E-002",nombre:"Carne Seca Cerro de la Silla",categoria:"Comida",estado:"Nuevo León",desc:"Machaca de res secada al sol en Monterrey y tortillas de harina sobaqueras hechas a mano.",productos:["Machaca de res 250 g","Tortillas de harina sobaqueras (docena)","Salsa de chile piquín"],rango:"$60 – $280",stand:"A-02",pagos:"Efectivo, tarjeta, transferencia",wa:"528116203948",ig:"carneseca.cerro"},
+  {id:"E-003",nombre:"Tlayudas Monte Albán",categoria:"Comida",estado:"Oaxaca",desc:"Tlayudas al comal con asiento, quesillo y tasajo que traemos de los Valles Centrales.",productos:["Tlayuda de tasajo","Memela con asiento y quesillo","Chapulines con limón"],rango:"$45 – $180",stand:"A-03",pagos:"Efectivo, transferencia",wa:"529512746031",ig:"tlayudas.montealban"},
+  {id:"E-004",nombre:"Hilo Mixteco",categoria:"Moda",estado:"Oaxaca",desc:"Blusas y huipiles bordados a mano por artesanas de la Mixteca, con diseños que cambian cada temporada.",productos:["Blusa bordada de manta","Huipil corto de telar","Bolsa tejida de palma"],rango:"$280 – $1,450",stand:"A-04",pagos:"Efectivo, tarjeta, transferencia",wa:"529531058274",ig:"hilomixteco"},
+  {id:"E-005",nombre:"Talavera Chiquita",categoria:"Arte",estado:"Puebla",desc:"Talavera poblana en miniatura: azulejos, platitos y macetas pintadas a mano en taller familiar.",productos:["Azulejo de talavera 10 × 10 cm","Maceta miniatura","Plato decorativo pintado a mano"],rango:"$70 – $520",stand:"A-05",pagos:"Efectivo, transferencia",wa:"522226491385",ig:"talavera.chiquita"},
+  {id:"E-006",nombre:"Café Tacaná",categoria:"Bebidas",estado:"Chiapas",desc:"Café de altura del volcán Tacaná, tostado en Tapachula. Lo preparamos en el momento o te lo llevas en grano.",productos:["Café de olla","Cold brew de la casa","Bolsa de café en grano 250 g"],rango:"$35 – $240",stand:"A-06",pagos:"Efectivo, tarjeta, transferencia",wa:"529626153087",ig:"cafe.tacana"},
+  {id:"E-007",nombre:"Marquesitas Paseo de Montejo",categoria:"Postres",estado:"Yucatán",desc:"Marquesitas crujientes con queso de bola, como las del parque de Santa Ana en Mérida.",productos:["Marquesita de queso de bola","Marquesita de Nutella y plátano","Champola de mamey"],rango:"$40 – $95",stand:"A-07",pagos:"Efectivo, transferencia",wa:"529992385016",ig:"marquesitas.montejo"},
+  {id:"E-008",nombre:"Jericallas Doña Lupe",categoria:"Postres",estado:"Jalisco",desc:"Jericallas tapatías con la costra quemadita, horneadas en cazuelita de barro de Tonalá.",productos:["Jericalla clásica","Jericalla de cajeta","Cocada horneada"],rango:"$30 – $110",stand:"A-08",pagos:"Efectivo",wa:"523318472650",ig:"jericallas.lupe"},
+  {id:"E-009",nombre:"Jipi de Bécal",categoria:"Accesorios",estado:"Campeche",desc:"Sombreros y abanicos de jipi japa tejidos en las cuevas de Bécal, donde la humedad hace flexible la palma.",productos:["Sombrero de jipi japa","Abanico de palma tejida","Llavero de jipi"],rango:"$60 – $1,200",stand:"A-09",pagos:"Efectivo, tarjeta",wa:"529811630472",ig:"jipidebecal"},
+  {id:"E-010",nombre:"Pozol del Grijalva",categoria:"Bebidas",estado:"Tabasco",desc:"Pozol de cacao batido a mano en jícara, frío y espeso, como se toma en Villahermosa al mediodía.",productos:["Pozol de cacao","Pozol blanco con azúcar","Dulce de coco tabasqueño"],rango:"$30 – $90",stand:"A-10",pagos:"Efectivo, transferencia",wa:"529933705128",ig:"pozol.grijalva"},
+  {id:"E-011",nombre:"Maque Uruapense",categoria:"Arte",estado:"Michoacán",desc:"Bateas y cajitas de maque, la laca prehispánica de Uruapan, decoradas con flores a punta de dedo.",productos:["Batea de maque mediana","Cajita alhajero","Aretes de maque"],rango:"$90 – $950",stand:"A-11",pagos:"Efectivo, transferencia",wa:"524521948307",ig:"maque.uruapense"},
+  {id:"E-012",nombre:"Vainilla de Papantla",categoria:"Postres",estado:"Veracruz",desc:"Vainas curadas en Papantla y postres hechos con ellas: flan, galletas y extracto puro.",productos:["Flan de vainilla","Galletas de vainilla y nuez","Extracto puro 60 ml"],rango:"$40 – $260",stand:"A-12",pagos:"Efectivo, tarjeta, transferencia",wa:"527848214936",ig:"vainilla.papantla"},
+  {id:"E-013",nombre:"Brownies del Campus",categoria:"Postres",estado:"",desc:"Brownies densos horneados la noche anterior. Hay uno sin gluten y siempre se acaba primero.",productos:["Brownie clásico","Brownie sin gluten","Blondie de nuez"],rango:"$35 – $70",stand:"B-01",pagos:"Efectivo, transferencia",wa:"525518374920",ig:"browniesdelcampus"},
+  {id:"E-014",nombre:"Aguas Frescas La Loma",categoria:"Bebidas",estado:"",desc:"Aguas de fruta de temporada sin jarabes: jamaica, horchata de arroz y la especial del día.",productos:["Agua de jamaica 1 L","Horchata de arroz 1 L","Agua del día"],rango:"$25 – $60",stand:"B-02",pagos:"Efectivo, transferencia",wa:"525540396127",ig:"aguas.laloma"},
+  {id:"E-015",nombre:"Estampa Norte",categoria:"Moda",estado:"",desc:"Playeras y tote bags serigrafiadas a mano en Huixquilucan con ilustraciones de alumnos.",productos:["Playera serigrafiada","Tote bag de manta","Sudadera edición Mercadito"],rango:"$180 – $650",stand:"B-03",pagos:"Efectivo, tarjeta, transferencia",wa:"525527104863",ig:"estampa.norte"},
+  {id:"E-016",nombre:"Resina y Flor",categoria:"Accesorios",estado:"",desc:"Aretes, anillos y separadores de resina con flores secas prensadas una por una.",productos:["Aretes de resina con flor","Anillo de resina","Separador de libros"],rango:"$90 – $320",stand:"B-04",pagos:"Efectivo, transferencia",wa:"525563820154",ig:"resinayflor"},
+  {id:"E-017",nombre:"Taller Tinta Roja",categoria:"Arte",estado:"",desc:"Grabados, prints y postales risográficas con escenas de la Ciudad de México y el Estado.",productos:["Print risográfico A4","Grabado en linóleo","Set de 5 postales"],rango:"$50 – $600",stand:"B-05",pagos:"Efectivo, tarjeta",wa:"525579310246",ig:"tintaroja.taller"},
+  {id:"E-018",nombre:"Molletes del Siete",categoria:"Comida",estado:"",desc:"Molletes de bolillo con frijol y queso gratinado, y chilaquiles para aguantar hasta la tarde.",productos:["Mollete con pico de gallo","Chilaquiles verdes","Torta de chilaquil"],rango:"$45 – $110",stand:"B-06",pagos:"Efectivo, transferencia",wa:"525592047381",ig:"molletesdelsiete"}
+].sort((a,b)=>(!!b.estado-!!a.estado)||a.stand.localeCompare(b.stand));
+
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const norm=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+const MENORES=new Set(["de","del","la","las","el","los","y","e","en"]);
+const sigla=n=>n.split(/\s+/).filter(w=>!MENORES.has(w.toLowerCase())).slice(0,2).map(w=>w[0]).join("").toUpperCase();
+const esForaneo=n=>n.estado!=="";
+
+// Ícones de contato, desenhados com primitivas
+const ICONO_WA='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12.5" cy="11.5" r="8.5" fill="#fff"/><path d="M6.2 16.8 3.5 21l4.9-1.6z" fill="#fff"/><path d="M9.3 7.4c.3-.3.8-.2 1 .1l1 1.8c.2.3.1.7-.2 1l-.6.6c.6 1.2 1.5 2.1 2.7 2.7l.6-.6c.3-.3.7-.3 1-.2l1.8 1c.4.2.4.7.1 1l-.8.8c-.6.6-1.5.8-2.3.5-2.3-.9-4.1-2.7-5-5-.3-.8-.1-1.7.5-2.3z" fill="#04893D"/></svg>';
+const ICONO_IG='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.2" fill="#fff" stroke="none"/></svg>';
+const ICONO_X='<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 3l14 14M17 3 3 17" stroke="#000" stroke-width="2"/></svg>';
+
+const tile=(n,conStand)=>{
+  const p=patron(n.id);
+  return `<span class="tile">${p.svg}<span class="sigla" style="color:${p.tinta}" aria-hidden="true">${esc(sigla(n.nombre))}</span>${esForaneo(n)?`<span class="etq-origen">${flecha("currentColor")}${esc(n.estado)}</span>`:""}${conStand?`<span class="etq-stand">Stand ${esc(n.stand)}</span>`:""}</span>`;
+};
+
+// Estado dos filtros — acumulativos sobre a mesma lista
+const filtro={q:"",cat:"",foraneos:false,estado:""};
+const $=id=>document.getElementById(id);
+const grade=$("grade"),contador=$("contador"),busca=$("busca"),selEstado=$("estado"),chips=$("chips"),ficha=$("ficha"),hoja=$("hoja");
+
+function coincide(n){
+  if(filtro.cat&&n.categoria!==filtro.cat)return false;
+  if(filtro.foraneos&&!esForaneo(n))return false;
+  if(filtro.estado&&n.estado!==filtro.estado)return false;
+  if(filtro.q){
+    const texto=norm([n.nombre,n.desc,n.categoria,n.estado,n.stand,...n.productos].join(" "));
+    if(!norm(filtro.q).split(/\s+/).filter(Boolean).every(t=>texto.includes(t)))return false;
+  }
+  return true;
+}
+
+function render(){
+  const lista=NEGOCIOS.filter(coincide);
+  contador.textContent=`${lista.length} de ${TOTAL} negocios`;
+  grade.innerHTML=lista.length?lista.map(n=>`<button type="button" class="tarjeta" data-id="${n.id}" aria-label="${esc(n.nombre)}${esForaneo(n)?", foráneo de "+esc(n.estado):""}, stand ${esc(n.stand)}">${tile(n,true)}<span class="cuerpo"><span class="nombre">${esc(n.nombre)}</span><span class="desc">${esc(n.desc)}</span><span class="pie-tarjeta"><span class="cat">${esc(n.categoria)}</span><span class="rango">${esc(n.rango)}</span></span></span></button>`).join("")
+    :`<div class="vacio"><p>Ningún negocio coincide con tu búsqueda.</p><button type="button" data-limpiar>Limpiar filtros</button></div>`;
+}
+
+function pintarChips(){
+  chips.innerHTML=`<button type="button" class="chip foraneo" data-foraneos aria-pressed="${filtro.foraneos}">${flecha("currentColor")}Solo foráneos</button>`
+    +[["","Todas"],...CATEGORIAS.map(c=>[c,c])].map(([v,t])=>`<button type="button" class="chip" data-cat="${v}" aria-pressed="${filtro.cat===v}">${t}</button>`).join("");
+}
+
+function abrir(id){
+  const n=NEGOCIOS.find(x=>x.id===id);if(!n)return;
+  const wa=`https://wa.me/${n.wa}?text=${encodeURIComponent(MENSAJE)}`;
+  hoja.innerHTML=`<button type="button" class="cerrar" data-cerrar aria-label="Cerrar">${ICONO_X}</button>
+    ${tile(n,false)}
+    <div class="ficha-cuerpo">
+      <h2 id="ficha-nombre">${esc(n.nombre)}</h2>
+      <span class="pildora">${esForaneo(n)?`${flecha("currentColor")}Foráneo · ${esc(n.estado)}`:"Local"}</span>
+      <p class="texto">${esc(n.desc)}</p>
+      <h3>Lo que trae</h3>
+      <ul class="trae">${n.productos.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>
+      <dl class="meta">
+        <div><dt>Stand</dt><dd>${esc(n.stand)}</dd></div>
+        <div><dt>Precios</dt><dd>${esc(n.rango)}</dd></div>
+        <div><dt>Categoría</dt><dd>${esc(n.categoria)}</dd></div>
+        <div><dt>Pagos</dt><dd>${esc(n.pagos)}</dd></div>
+      </dl>
+      <div class="contacto">
+        <a class="wa" href="${wa}" target="_blank" rel="noopener">${ICONO_WA}WhatsApp</a>
+        <a class="ig" href="https://instagram.com/${encodeURIComponent(n.ig)}" target="_blank" rel="noopener">${ICONO_IG}@${esc(n.ig)}</a>
+      </div>
+    </div>`;
+  hoja.scrollTop=0;
+  ficha.showModal();
+}
+
+function limpiar(){
+  filtro.q="";filtro.cat="";filtro.foraneos=false;filtro.estado="";
+  busca.value="";selEstado.value="";
+  pintarChips();render();
+}
+
+// Montagem
+document.querySelectorAll("[data-rafaga]").forEach(el=>{el.innerHTML=rafaga()});
+document.querySelector("[data-flecha-leyenda]").insertAdjacentHTML("afterbegin",flecha("currentColor"));
+[...new Set(NEGOCIOS.filter(esForaneo).map(n=>n.estado))].sort((a,b)=>a.localeCompare(b,"es")).forEach(e=>selEstado.add(new Option(e,e)));
+pintarChips();
+render();
+
+busca.addEventListener("input",()=>{filtro.q=busca.value.trim();render()});
+selEstado.addEventListener("change",()=>{filtro.estado=selEstado.value;render()});
+chips.addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.hasAttribute("data-foraneos"))filtro.foraneos=!filtro.foraneos;
+  else filtro.cat=b.dataset.cat;
+  pintarChips();render();
+  const activo=chips.querySelector(b.hasAttribute("data-foraneos")?"[data-foraneos]":`[data-cat="${filtro.cat}"]`);
+  if(activo)activo.focus();
+});
+grade.addEventListener("click",e=>{
+  if(e.target.closest("[data-limpiar]")){limpiar();busca.focus();return}
+  const t=e.target.closest(".tarjeta");if(t)abrir(t.dataset.id);
+});
+ficha.addEventListener("click",e=>{
+  if(e.target===ficha||e.target.closest("[data-cerrar]"))ficha.close();
+});
+</script>
+</body>
+</html>

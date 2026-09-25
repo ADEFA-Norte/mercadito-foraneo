@@ -112,7 +112,7 @@ main .envoltura{padding-top:20px;padding-bottom:56px}
 .fotos{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:1px;margin-top:16px;background:var(--linea);scrollbar-width:none;overscroll-behavior-x:contain}
 .fotos::-webkit-scrollbar{display:none}
 /* min-width:0 e align-self: sem eles, o flex item com aspect-ratio cresce até à largura natural da foto */
-.fotos img{display:block;scroll-snap-align:start;flex:0 0 86%;min-width:0;align-self:flex-start;aspect-ratio:1/1;object-fit:cover;background:var(--fondo)}
+.fotos img{display:block;scroll-snap-align:start;flex:0 0 100%;min-width:0;align-self:flex-start;aspect-ratio:1/1;object-fit:contain}
 .puntos{display:flex;justify-content:center;gap:6px;margin-top:10px}
 .puntos span{width:6px;height:6px;background:var(--linea)}
 .puntos span.activo{background:var(--negro)}
@@ -257,7 +257,7 @@ function patron(id){
     capas+=`<g fill="${c}" transform="translate(${dx},${dy}) rotate(${a}) scale(${s})">${GLIFO}</g>`;
   }
   const svg=`<svg viewBox="-110 -110 220 220" preserveAspectRatio="xMidYMid slice" width="100%" height="100%" aria-hidden="true"><rect x="-110" y="-110" width="220" height="220" fill="${RAMPA[i]}"/>${capas}</svg>`;
-  return {svg,tinta:i<CORTE?"#FFFFFF":"#000000"};
+  return {svg,tinta:i<CORTE?"#FFFFFF":"#000000",base:RAMPA[i]};
 }
 
 const MENSAJE="Hola, los vi en el catálogo del Mercadito Foráneo de ADEFA.";
@@ -392,7 +392,9 @@ function abrir(id){
     n.ig&&`<a class="ig" href="https://instagram.com/${encodeURIComponent(n.ig)}" target="_blank" rel="noopener">${ICONO_IG}@${esc(n.ig)}</a>`
   ].filter(Boolean);
   const meta=[["Stand",n.stand],["Precios",n.rango],["Categoría",n.categoria],["Pagos",n.pagos]].filter(([,v])=>v);
-  const fotos=n.fotos.length?`<div class="fotos" role="group" aria-label="Fotos de ${esc(n.nombre)}" tabindex="0">${n.fotos.map((f,k)=>`<img src="${esc(f)}" alt="${esc(n.nombre)}, foto ${k+1} de ${n.fotos.length}" loading="lazy" decoding="async">`).join("")}</div>${n.fotos.length>1?`<div class="puntos" aria-hidden="true">${"<span></span>".repeat(n.fotos.length)}</div>`:""}`:"";
+  // contain: nada se recorta; el hueco toma el color base del patrón del negocio
+  const base=patron(n.id).base;
+  const fotos=n.fotos.length?`<div class="fotos" role="group" aria-label="Fotos de ${esc(n.nombre)}" tabindex="0">${n.fotos.map((f,k)=>`<img src="${esc(f)}" style="background:${base}" alt="${esc(n.nombre)}, foto ${k+1} de ${n.fotos.length}" loading="lazy" decoding="async">`).join("")}</div>${n.fotos.length>1?`<div class="puntos" aria-hidden="true">${"<span></span>".repeat(n.fotos.length)}</div>`:""}`:"";
   pararCarrusel();
   hoja.classList.toggle("con-fotos",!!fotos);
   hoja.innerHTML=`<button type="button" class="cerrar" data-cerrar aria-label="Cerrar">${ICONO_X}</button>

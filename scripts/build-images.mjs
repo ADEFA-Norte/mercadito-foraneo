@@ -1,11 +1,11 @@
 // Lê fotos-originais/MERCADITO FORÁNEO/<pasta por negócio>/ e gera, por expositor:
-//   img/expositores/<id>-1.webp, -2.webp… a 900px (ficha)
-//   img/expositores/<id>-thumb.webp a 500px, da foto mais quadrada (tarjeta)
+//   img/expositores/<id>-1.webp, -2.webp… a 900px (ficha); a -1 é a capa
+//   img/expositores/<id>-thumb.webp a 500px, da mesma capa (tarjeta)
 // O casamento pasta → expositor está em fotos.mjs.
 // Uso: node scripts/build-images.mjs   (e depois node scripts/build-data.mjs, se o aviso final aparecer)
 import { readFileSync, mkdirSync, readdirSync, unlinkSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import sharp from "sharp";
 import { PASTA_ORIGINAIS, PASTA_SAIDA, emparelharPastas, caminhoFoto, caminhoThumb } from "./fotos.mjs";
 import { lerExpositores } from "./build-data.mjs";
@@ -31,23 +31,31 @@ const gerar = (origem, destino, largura) =>
     .webp({ quality: QUALIDADE })
     .toFile(join(RAIZ, destino));
 
-// Miniatura: a foto mais perto de 1:1 (o tile é quadrado, é a que perde menos
-// no corte); em empate, a de maior resolução. |ln(l/a)| trata igual retrato e
-// paisagem, por isso a rotação EXIF não altera a escolha.
-async function escolherMiniatura(lista) {
-  const medidas = await Promise.all(lista.map(async f => {
+// Ordem da tira: primeiro a foto que também é a miniatura, depois o resto por
+// ordem alfabética. Assim a grade e a ficha abrem com a mesma imagem.
+// A escolhida é um ficheiro com "logo" no nome, se houver; senão qualquer foto.
+// Entre as candidatas ganha a mais perto de 1:1 (o tile é quadrado, é a que perde
+// menos no corte) e, em empate, a de maior resolução. |ln(l/a)| trata igual
+// retrato e paisagem, por isso a rotação EXIF não altera a escolha.
+const eLogo = f => /logo/i.test(basename(f).normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
+async function ordenar(lista) {
+  const logos = lista.filter(eLogo);
+  const candidatas = logos.length ? logos : lista;
+  const medidas = await Promise.all(candidatas.map(async f => {
     const { width, height } = await sharp(join(RAIZ, f)).metadata();
     return { f, desvio: Math.round(Math.abs(Math.log(width / height)) * 1000), area: width * height };
   }));
-  return medidas.sort((a, b) => a.desvio - b.desvio || b.area - a.area)[0].f;
+  const capa = medidas.sort((a, b) => a.desvio - b.desvio || b.area - a.area)[0].f;
+  return [capa, ...lista.filter(f => f !== capa)];
 }
 
 let n = 0, fotos = 0;
-for (const [id, lista] of porId) {
+for (const [id, original] of porId) {
+  const lista = await ordenar(original);
   for (const [k, f] of lista.entries()) {
     await gerar(f, caminhoFoto(id, k + 1), LARGURA_FICHA); n++; fotos++;
   }
-  await gerar(await escolherMiniatura(lista), caminhoThumb(id), LARGURA_THUMB); n++;
+  await gerar(lista[0], caminhoThumb(id), LARGURA_THUMB); n++;
 }
 
 console.log(`${fotos} fotos de ${porId.size} expositores · ${n} webp gerados em ${PASTA_SAIDA}/`);

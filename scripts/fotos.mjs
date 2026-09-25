@@ -1,40 +1,72 @@
-// Casamento fotos-originais/ → expositor, partilhado por build-data e build-images.
-// "Joyería Viceli.jpg", "joyeria viceli 2.png" e "JOYERIA_VICELI (3).jpeg"
-// casam todos com a marca "Joyería Viceli".
-import { existsSync, readdirSync } from "node:fs";
-import { extname, basename } from "node:path";
+// Casamento de fotos → expositor, partilhado por build-data e build-images.
+// Cada subpasta de fotos-originais/MERCADITO FORÁNEO/ é um negócio. O nome da
+// pasta casa com o contacto (nome da pessoa) ou com a marca, por tokens.
+import { existsSync, readdirSync, statSync } from "node:fs";
+import { extname, join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
-export const PASTA_ORIGINAIS = "fotos-originais";
+const RAIZ = join(dirname(fileURLToPath(import.meta.url)), "..");
+export const PASTA_ORIGINAIS = "fotos-originais/MERCADITO FORÁNEO";
 export const PASTA_SAIDA = "img/expositores";
-export const EXTENSOES = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif", ".tif", ".tiff", ".gif"]);
+export const EXTENSOES = new Set([".jpg", ".jpeg", ".png", ".webp"]);
 
-export const normalizar = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+// Exceções para gralhas da planilha, aplicadas antes do casamento por tokens.
+// O destino é a marca, o contacto ou o id do expositor.
+export const ALIAS_PASTAS = {
+  "XIMENA CALVO": "Desereta",       // na folha: Ximena Calva Osorio
+  // Linha dividida Ana Janet Vera / Sebas Arce: as pastas vêm trocadas em relação às pessoas.
+  "SEBASTIAN ARCE": "AR Watches",   // as fotos são de relógios
+  "ANA JANET": "Morona",            // as fotos são de bolachas
+};
 
 export const caminhoFoto = (id, k) => `${PASTA_SAIDA}/${id}-${k}.webp`;
 export const caminhoThumb = id => `${PASTA_SAIDA}/${id}-thumb.webp`;
 
-export function listarOriginais(dir) {
-  if (!existsSync(dir)) return [];
-  return readdirSync(dir).filter(f => !f.startsWith(".")).sort((a, b) => a.localeCompare(b, "es"));
+const tokens = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
+  .replace(/[^a-z0-9]+/g, " ").trim().split(" ").filter(Boolean);
+const chave = s => tokens(s).join(" ");
+const porNome = (a, b) => a.localeCompare(b, "es", { numeric: true });
+
+function candidatos(pasta, expositores) {
+  const alias = Object.entries(ALIAS_PASTAS).find(([p]) => chave(p) === chave(pasta));
+  if (alias) {
+    const alvo = chave(alias[1]);
+    return expositores.filter(e => e.id === alias[1] || [e.marca, e.nombre, e.contacto].some(v => v && chave(v) === alvo));
+  }
+  const palavras = tokens(pasta).filter(t => t.length > 2);
+  if (!palavras.length) return [];
+  return expositores.filter(e => {
+    const disponiveis = new Set([...tokens(e.contacto || ""), ...tokens(e.marca || "")]);
+    return palavras.every(t => disponiveis.has(t));
+  });
 }
 
-// Devolve { porId: Map(id → [ficheiros por ordem]), semCasar: [ficheiros], ignorados: [ficheiros] }
-export function emparelhar(expositores, ficheiros) {
-  const porMarca = new Map(expositores.map(e => [normalizar(e.nombre), e.id]));
-  const porId = new Map();
-  const semCasar = [], ignorados = [];
-  for (const f of ficheiros) {
-    if (!EXTENSOES.has(extname(f).toLowerCase())) { ignorados.push(f); continue; }
-    const base = basename(f, extname(f));
-    // Primeiro o nome inteiro (para marcas que acabam em número, como "Lucky Things8"),
-    // depois sem o sufixo de ordem: " 2", "-2", "_2", "(2)".
-    let id = porMarca.get(normalizar(base)), ordem = 0;
-    const suf = base.match(/^(.*?)[\s_-]*\(?(\d+)\)?$/);
-    if (!id && suf) { id = porMarca.get(normalizar(suf[1])); ordem = Number(suf[2]); }
-    if (!id) { semCasar.push(f); continue; }
-    if (!porId.has(id)) porId.set(id, []);
-    porId.get(id).push({ f, ordem });
+// Devolve { porId: Map(id → [caminhos relativos à raiz]), semCasar, ambiguas, pdfs, ignorados }
+export function emparelharPastas(expositores, { silencioso = false } = {}) {
+  const res = { porId: new Map(), semCasar: [], ambiguas: [], pdfs: [], ignorados: [] };
+  const base = join(RAIZ, PASTA_ORIGINAIS);
+  if (!existsSync(base)) return res;
+
+  const pastas = readdirSync(base).filter(p => !p.startsWith(".") && statSync(join(base, p)).isDirectory()).sort(porNome);
+  for (const pasta of pastas) {
+    const achados = candidatos(pasta, expositores);
+    if (achados.length !== 1) {
+      if (achados.length > 1) {
+        res.ambiguas.push({ pasta, ids: achados.map(e => e.id) });
+        if (!silencioso) console.warn(`aviso: a pasta "${pasta}" casa com ${achados.map(e => `${e.id} ${e.nombre}`).join(", ")}; ignorada`);
+      } else res.semCasar.push(pasta);
+      continue;
+    }
+    const { id } = achados[0];
+    const ficheiros = readdirSync(join(base, pasta)).filter(f => !f.startsWith(".")).sort(porNome);
+    for (const f of ficheiros) {
+      const rel = `${PASTA_ORIGINAIS}/${pasta}/${f}`;
+      const ext = extname(f).toLowerCase();
+      if (ext === ".pdf") { res.pdfs.push(rel); continue; }
+      if (!EXTENSOES.has(ext)) { res.ignorados.push(rel); continue; }
+      if (!res.porId.has(id)) res.porId.set(id, []);
+      res.porId.get(id).push(rel);
+    }
   }
-  for (const [id, l] of porId) porId.set(id, l.sort((a, b) => a.ordem - b.ordem || a.f.localeCompare(b.f, "es")).map(x => x.f));
-  return { porId, semCasar, ignorados };
+  return res;
 }

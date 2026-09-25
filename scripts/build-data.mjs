@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { createRequire } from "node:module";
+import { PASTA_ORIGINAIS, listarOriginais, emparelhar, caminhoFoto } from "./fotos.mjs";
 
 const XLSX = createRequire(import.meta.url)("xlsx");
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -130,9 +131,14 @@ const EXPOSITORES = brutos.map(({ foraneo, persona, marca, l }, i) => {
     pagos: "",
     wa: whatsapp(l[6]),
     ig,
+    fotos: [],
   };
   return { ...e, ...sobreposicao };
 });
+
+// fotos: os caminhos que build-images.mjs gera a partir de fotos-originais/
+const { porId } = emparelhar(EXPOSITORES, listarOriginais(join(RAIZ, PASTA_ORIGINAIS)));
+for (const e of EXPOSITORES) e.fotos = (porId.get(e.id) || []).map((_, k) => caminhoFoto(e.id, k + 1));
 
 const marcas = new Set(brutos.map(r => r.marca));
 for (const m of Object.keys(SOBREPOSICOES))
@@ -151,5 +157,5 @@ writeFileSync(INDEX, html.slice(0, a) + js + html.slice(b));
 const nF = EXPOSITORES.filter(e => e.foraneo).length;
 const porCat = EXPOSITORES.reduce((m, e) => (m[e.categoria] = (m[e.categoria] || 0) + 1, m), {});
 console.log(`${EXPOSITORES.length} expositores: ${nF} foráneos, ${EXPOSITORES.length - nF} locales`);
-console.log(`sin WhatsApp: ${EXPOSITORES.filter(e => !e.wa).length} · sin Instagram: ${EXPOSITORES.filter(e => !e.ig).length} · sin rango: ${EXPOSITORES.filter(e => !e.rango).length}`);
+console.log(`sin WhatsApp: ${EXPOSITORES.filter(e => !e.wa).length} · sin Instagram: ${EXPOSITORES.filter(e => !e.ig).length} · sin rango: ${EXPOSITORES.filter(e => !e.rango).length} · con fotos: ${EXPOSITORES.filter(e => e.fotos.length).length}`);
 console.table(porCat);

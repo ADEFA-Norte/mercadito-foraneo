@@ -47,7 +47,7 @@ const SOBREPOSICOES = {
   "Peluches tu-tuy": { categoria: "Juguetes y coleccionables" },
   "Bolita Pet": { categoria: "Mascotas" },
   "Holy Mustard": { categoria: "Moda" },
-  "Maria Formiga Mx Br": { rango: "$25 – $350" },
+  "Maria Formiga Mx Br": { rango: "$25 – $350", wa: "525541774506" },
 };
 
 // Negócios que não estão na folha. Entram depois dos da folha, com os ids seguintes.

@@ -25,6 +25,10 @@ export const ALIAS_PASTAS = {
 // fotos-originais/; solo se ignoran. Ruta: "<pasta>/<fichero>".
 export const EXCLUIR_FOTOS = new Set([
   "MARÍA FERNANDA/WhatsApp Image 2026-09-23 at 10.49.48 AM.jpeg",  // logo "SS Fitness" de SportStyle; copiado a MARGARITA SOTO
+  // Paponas y enchilados pidió una sola imagen: el logo conjunto (Paponas, Enchilados, Le Petit Jardin)
+  "CLAUDIA CARRASCO/WhatsApp Image 2026-09-23 at 7.54.14 PM (1).jpeg",
+  "CLAUDIA CARRASCO/WhatsApp Image 2026-09-23 at 7.54.14 PM (2).jpeg",
+  "CLAUDIA CARRASCO/WhatsApp Image 2026-09-23 at 7.54.14 PM.jpeg",
 ].map(r => r.normalize("NFC")));
 
 export const caminhoFoto = (id, k) => `${PASTA_SAIDA}/${id}-${k}.webp`;

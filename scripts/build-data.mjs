@@ -64,7 +64,7 @@ const NOVOS_EXPOSITORES = [
   },
   {
     nombre: "Bruno y Oli",
-    foraneo: false,
+    foraneo: true,
     categoria: "Mascotas",
     desc: "Galletas y spreads para perro, 100% naturales, sin conservadores ni químicos añadidos.",
     rango: "$100 – $150",

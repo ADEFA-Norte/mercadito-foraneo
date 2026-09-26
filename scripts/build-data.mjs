@@ -53,6 +53,12 @@ const SOBREPOSICOES = {
 };
 
 // Negócios que não estão na folha. Entram depois dos da folha, com os ids seguintes.
+// Negocios de la folha que ya no participan, por marca (o nombre generado). Se quitan
+// después de asignar los ids, para que los demás conserven el suyo y sus fotos.
+const EXCLUIR_EXPOSITORES = new Set([
+  "Clementina Shop",
+]);
+
 const NOVOS_EXPOSITORES = [
   {
     nombre: "Espacio Brasil",
@@ -224,8 +230,13 @@ export function lerExpositores() {
     });
   }
 
+  for (const n of EXCLUIR_EXPOSITORES)
+    if (!EXPOSITORES.some(e => e.marca === n || e.nombre === n)) console.warn(`aviso: el negocio a excluir "${n}" ya no está en la folha`);
+
   // Foráneos primeiro, também para os novos (sort estável: mantém a ordem dentro de cada grupo)
-  return EXPOSITORES.sort((x, y) => y.foraneo - x.foraneo);
+  return EXPOSITORES
+    .filter(e => !EXCLUIR_EXPOSITORES.has(e.marca) && !EXCLUIR_EXPOSITORES.has(e.nombre))
+    .sort((x, y) => y.foraneo - x.foraneo);
 }
 
 const principal = import.meta.url === pathToFileURL(process.argv[1] || "").href;

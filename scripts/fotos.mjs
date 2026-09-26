@@ -17,6 +17,8 @@ export const ALIAS_PASTAS = {
   // Linha dividida Ana Janet Vera / Sebas Arce: as pastas vêm trocadas em relação às pessoas.
   "SEBASTIAN ARCE": "AR Watches",   // as fotos são de relógios
   "ANA JANET": "Morona",            // as fotos são de bolachas
+  // Foráneo sem marca: o nome vem do Instagram e o contacto é outro (Leonardo Wanderkoke)
+  "MARIA FORMIGA": "Maria Formiga Mx Br",
 };
 
 export const caminhoFoto = (id, k) => `${PASTA_SAIDA}/${id}-${k}.webp`;

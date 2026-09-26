@@ -53,10 +53,17 @@ a{color:inherit}
 .hero .antetitulo{margin:0 0 14px;font:500 13px/1.3 var(--jost);letter-spacing:.08em;text-transform:uppercase;color:var(--acento)}
 .hero h1{margin:0;font:700 clamp(40px,8.4vw,76px)/.95 var(--zilla);letter-spacing:-1.8px;max-width:9ch}
 .hero .sub{margin:20px 0 0;max-width:34em;font:300 18px/1.45 var(--jost);color:var(--gris)}
-.datos{list-style:none;margin:32px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,1fr);gap:20px 16px;max-width:760px}
+.datos{list-style:none;margin:28px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,1fr);gap:20px 16px;max-width:760px}
 .datos li{border-top:2px solid var(--negro);padding-top:10px}
 .datos b{display:block;font:700 30px/1 var(--zilla);letter-spacing:-.5px}
 .datos span{display:block;margin-top:4px;font:400 14px/1.3 var(--jost);color:var(--gris)}
+/* Dónde: mismo filete y misma jerarquía que los datos, a todo el ancho */
+.lugar{margin-top:28px;max-width:760px;border-top:2px solid var(--negro);padding-top:10px}
+.lugar b{display:block;font:700 30px/1.05 var(--zilla);letter-spacing:-.5px}
+.lugar>span{display:block;margin-top:4px;font:400 14px/1.3 var(--jost);color:var(--gris)}
+.acciones{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.como-llegar{display:inline-flex;align-items:center;min-height:48px;padding:0 16px;border:1px solid var(--negro);background:var(--papel);font:500 15px/1 var(--jost);color:var(--negro);text-decoration:none}
+.como-llegar:hover{background:var(--negro);color:#fff}
 @media (min-width:700px){.datos{grid-template-columns:repeat(4,1fr)}.hero .envoltura{padding-top:72px;padding-bottom:64px}}
 
 /* Filtros — no telemóvel só a linha de busca é fixa; chips e legenda vão para a gaveta */
@@ -184,8 +191,9 @@ main .envoltura{padding-top:20px;padding-bottom:56px}
 .rodape p{margin:0;font:300 14px/1.5 var(--jost);color:#C9CFD1}
 .rodape a{color:#fff}
 /* Instagram de ADEFA: mismo botón que el contacto de las fichas */
-.rodape .contacto-adefa{display:inline-flex;align-items:center;gap:8px;min-height:48px;margin-top:14px;padding:0 16px;font:500 15px/1 var(--jost);text-decoration:none}
-.rodape .contacto-adefa svg{width:20px;height:20px;flex:none}
+.contacto-adefa{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 16px;font:500 15px/1 var(--jost);color:#fff;text-decoration:none}
+.contacto-adefa svg{width:20px;height:20px;flex:none}
+.rodape .contacto-adefa{margin-top:14px}
 .rodape .firma{display:flex;align-items:center;gap:10px;grid-column:1/-1;padding-top:20px;border-top:1px solid #2A2E2F;font:700 18px/1 var(--zilla)}
 .rodape .firma .rafaga{width:24px;height:24px}
 @media (min-width:700px){.rodape .envoltura{grid-template-columns:repeat(4,1fr)}}
@@ -214,6 +222,14 @@ main .envoltura{padding-top:20px;padding-bottom:56px}
     <p class="antetitulo">ADEFA · Anáhuac México Norte</p>
     <h1>Lo que trajimos de casa</h1>
     <p class="sub">Comida, moda y arte hechos por estudiantes que vienen de toda la República, y por los de aquí. Dos días en el Salón San Pablo II: miércoles 30 de septiembre de 11:30 a 18:00 y jueves 1 de octubre de 10:00 a 18:00.</p>
+    <div class="lugar">
+      <b>Salón San Pablo II</b>
+      <span>Universidad Anáhuac México Norte · Huixquilucan, Edomex</span>
+      <div class="acciones">
+        <a class="como-llegar" href="https://www.google.com/maps/search/?api=1&amp;query=Universidad+An%C3%A1huac+M%C3%A9xico+Norte" target="_blank" rel="noopener">Cómo llegar</a>
+        <a class="contacto-adefa ig" href="https://www.instagram.com/adefanorte/" target="_blank" rel="noopener" data-icono-ig>@adefanorte</a>
+      </div>
+    </div>
     <ul class="datos">
       <li><b data-dato="total"></b><span>negocios</span></li>
       <li><b data-dato="foraneos"></b><span>foráneos</span></li>

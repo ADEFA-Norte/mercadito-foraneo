@@ -183,6 +183,9 @@ main .envoltura{padding-top:20px;padding-bottom:56px}
 .rodape h2{margin:0 0 6px;font:600 17px/1.2 var(--zilla)}
 .rodape p{margin:0;font:300 14px/1.5 var(--jost);color:#C9CFD1}
 .rodape a{color:#fff}
+/* Instagram de ADEFA: mismo botón que el contacto de las fichas */
+.rodape .contacto-adefa{display:inline-flex;align-items:center;gap:8px;min-height:48px;margin-top:14px;padding:0 16px;font:500 15px/1 var(--jost);text-decoration:none}
+.rodape .contacto-adefa svg{width:20px;height:20px;flex:none}
 .rodape .firma{display:flex;align-items:center;gap:10px;grid-column:1/-1;padding-top:20px;border-top:1px solid #2A2E2F;font:700 18px/1 var(--zilla)}
 .rodape .firma .rafaga{width:24px;height:24px}
 @media (min-width:700px){.rodape .envoltura{grid-template-columns:repeat(4,1fr)}}
@@ -260,6 +263,7 @@ main .envoltura{padding-top:20px;padding-bottom:56px}
     <div>
       <h2>ADEFA</h2>
       <p>Asociación de Estudiantes Foráneos Anáhuac. Organizamos el Mercadito para que lo de casa llegue hasta acá.</p>
+      <a class="contacto-adefa ig" href="https://www.instagram.com/adefanorte/" target="_blank" rel="noopener" data-icono-ig>@adefanorte</a>
     </div>
     <div class="firma"><span class="rafaga" data-rafaga></span>Mercadito Foráneo</div>
   </div>
@@ -530,6 +534,7 @@ function limpiar(){
 
 // Montagem
 document.querySelectorAll("[data-rafaga]").forEach(el=>{el.innerHTML=rafaga()});
+document.querySelectorAll("[data-icono-ig]").forEach(el=>el.insertAdjacentHTML("afterbegin",ICONO_IG));
 document.querySelector("[data-flecha-leyenda]").insertAdjacentHTML("afterbegin",flecha("currentColor"));
 const dato=(k,v)=>{document.querySelector(`[data-dato="${k}"]`).textContent=v};
 dato("total",EXPOSITORES.length);

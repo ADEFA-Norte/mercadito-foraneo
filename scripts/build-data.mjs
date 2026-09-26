@@ -48,6 +48,8 @@ const SOBREPOSICOES = {
   "Bolita Pet": { categoria: "Mascotas" },
   "Holy Mustard": { categoria: "Moda" },
   "Maria Formiga Mx Br": { rango: "$25 – $350", wa: "525541774506" },
+  // Foráneo sin marca ni Instagram: en la folha solo está el nombre de la persona
+  "Sofía Giménez Rodríguez": { nombre: "Sookies" },
 };
 
 // Negócios que não estão na folha. Entram depois dos da folha, com os ids seguintes.
@@ -204,7 +206,8 @@ export function lerExpositores() {
     return { ...e, ...sobreposicao };
   });
 
-  const chaves = new Set(EXPOSITORES.flatMap(e => [e.marca, e.nombre]));
+  // contacto: una sobreposición puede cambiar el nombre (Sookies); la clave es el nombre de la persona
+  const chaves = new Set(EXPOSITORES.flatMap(e => [e.marca, e.nombre, e.contacto]));
   for (const m of Object.keys(SOBREPOSICOES))
     if (!chaves.has(m)) console.warn(`aviso: a sobreposição "${m}" não corresponde a nenhuma marca nem nome da folha`);
 

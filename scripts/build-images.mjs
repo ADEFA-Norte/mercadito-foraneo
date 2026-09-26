@@ -17,7 +17,7 @@ const LARGURA_THUMB = 500;
 
 // Os expositores vêm da planilha, com contacto e marca, e com os mesmos ids que build-data
 const EXPOSITORES = lerExpositores();
-const { porId, semCasar, ambiguas, pdfs, ignorados } = emparelharPastas(EXPOSITORES);
+const { porId, semCasar, ambiguas, pdfs, ignorados, excluidos } = emparelharPastas(EXPOSITORES);
 
 // Apaga o que foi gerado antes, para não ficarem fotos de ids que mudaram
 const saida = join(RAIZ, PASTA_SAIDA);
@@ -69,6 +69,10 @@ if (ambiguas.length) {
 if (pdfs.length) {
   console.log(`\nPDF, não processados (${pdfs.length}):`);
   for (const f of pdfs) console.log(`  ${f.slice(PASTA_ORIGINAIS.length + 1)}`);
+}
+if (excluidos.length) {
+  console.log(`\nExcluidas a mano en EXCLUIR_FOTOS (${excluidos.length}):`);
+  for (const f of excluidos) console.log(`  ${f.slice(PASTA_ORIGINAIS.length + 1)}`);
 }
 if (ignorados.length) {
   console.log(`\nOutros ficheiros ignorados (${ignorados.length}):`);

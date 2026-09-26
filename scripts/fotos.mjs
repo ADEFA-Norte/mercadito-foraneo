@@ -21,6 +21,12 @@ export const ALIAS_PASTAS = {
   "MARIA FORMIGA": "Maria Formiga Mx Br",
 };
 
+// Fotos que están en la carpeta de un negocio pero no son suyas. No se borran de
+// fotos-originais/; solo se ignoran. Ruta: "<pasta>/<fichero>".
+export const EXCLUIR_FOTOS = new Set([
+  "MARÍA FERNANDA/WhatsApp Image 2026-09-23 at 10.49.48 AM.jpeg",  // logo "SS Fitness", no es de Bony's Store
+].map(r => r.normalize("NFC")));
+
 export const caminhoFoto = (id, k) => `${PASTA_SAIDA}/${id}-${k}.webp`;
 export const caminhoThumb = id => `${PASTA_SAIDA}/${id}-thumb.webp`;
 
@@ -45,7 +51,7 @@ function candidatos(pasta, expositores) {
 
 // Devolve { porId: Map(id → [caminhos relativos à raiz]), semCasar, ambiguas, pdfs, ignorados }
 export function emparelharPastas(expositores, { silencioso = false } = {}) {
-  const res = { porId: new Map(), semCasar: [], ambiguas: [], pdfs: [], ignorados: [] };
+  const res = { porId: new Map(), semCasar: [], ambiguas: [], pdfs: [], ignorados: [], excluidos: [] };
   const base = join(RAIZ, PASTA_ORIGINAIS);
   if (!existsSync(base)) return res;
 
@@ -66,6 +72,7 @@ export function emparelharPastas(expositores, { silencioso = false } = {}) {
       const ext = extname(f).toLowerCase();
       if (ext === ".pdf") { res.pdfs.push(rel); continue; }
       if (!EXTENSOES.has(ext)) { res.ignorados.push(rel); continue; }
+      if (EXCLUIR_FOTOS.has(`${pasta}/${f}`.normalize("NFC"))) { res.excluidos.push(rel); continue; }
       if (!res.porId.has(id)) res.porId.set(id, []);
       res.porId.get(id).push(rel);
     }

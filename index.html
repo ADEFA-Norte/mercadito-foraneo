@@ -79,6 +79,9 @@ a{color:inherit}
 .acciones{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
 .como-llegar{display:inline-flex;align-items:center;min-height:48px;padding:0 16px;border:1px solid var(--negro);background:var(--papel);font:500 15px/1 var(--jost);color:var(--negro);text-decoration:none}
 .como-llegar:hover{background:var(--negro);color:#fff}
+/* Compartir en el hero: mismo botón delineado que "Cómo llegar", con icono */
+.compartir{gap:8px;cursor:pointer}
+.compartir svg{width:18px;height:18px;flex:none}
 @media (min-width:700px){.datos{grid-template-columns:repeat(4,1fr)}.hero .envoltura{padding-top:72px;padding-bottom:64px}}
 
 /* Filtros — no telemóvel só a linha de busca é fixa; chips e legenda vão para a gaveta */
@@ -199,6 +202,18 @@ main .envoltura{padding-top:20px;padding-bottom:56px}
 }
 @keyframes aparecer{from{transform:scale(.97);opacity:0}to{transform:none;opacity:1}}
 
+/* Banda para invitar a compartir, entre el catálogo y el pie */
+.banda-compartir{background:var(--papel);border-top:1px solid var(--linea)}
+.banda-compartir .envoltura{padding-top:44px;padding-bottom:48px}
+.banda-compartir .antetitulo{margin:0 0 10px;font:500 13px/1.3 var(--jost);letter-spacing:.08em;text-transform:uppercase;color:var(--acento)}
+.banda-compartir h2{margin:0;max-width:18ch;font:700 clamp(28px,5.2vw,44px)/1 var(--zilla);letter-spacing:-1px}
+.banda-compartir p.texto-banda{margin:14px 0 0;max-width:34em;font:300 17px/1.45 var(--jost);color:var(--gris)}
+.banda-compartir .acciones{margin-top:22px}
+.boton-compartir{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 18px;border:0;background:var(--acento);color:#fff;font:500 15px/1 var(--jost);cursor:pointer}
+.boton-compartir svg{width:18px;height:18px;flex:none}
+.boton-wa{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 18px;font:500 15px/1 var(--jost);color:#fff;text-decoration:none}
+.boton-wa svg{width:20px;height:20px;flex:none}
+
 /* Rodapé */
 .rodape{background:var(--negro);color:#fff}
 .rodape .envoltura{padding-top:40px;padding-bottom:calc(40px + env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr;gap:24px}
@@ -243,6 +258,7 @@ main .envoltura{padding-top:20px;padding-bottom:56px}
       <div class="acciones">
         <a class="como-llegar" href="https://www.google.com/maps/search/?api=1&amp;query=Universidad+An%C3%A1huac+M%C3%A9xico+Norte" target="_blank" rel="noopener">Cómo llegar</a>
         <a class="contacto-adefa ig" href="https://www.instagram.com/adefanorte/" target="_blank" rel="noopener" data-icono-ig>@adefanorte</a>
+        <button type="button" class="como-llegar compartir" data-compartir><span data-compartir-texto>Compartir</span></button>
       </div>
     </div>
     <ul class="datos">
@@ -276,6 +292,19 @@ main .envoltura{padding-top:20px;padding-bottom:56px}
     <div class="grade" id="grade"></div>
   </div>
 </main>
+
+<section class="banda-compartir" aria-labelledby="banda-compartir-titulo">
+  <div class="envoltura">
+    <p class="antetitulo">Pásalo</p>
+    <h2 id="banda-compartir-titulo">¿Conoces a alguien que no se lo puede perder?</h2>
+    <p class="texto-banda">Mándale el catálogo. Cada persona que llega es una venta más para un estudiante que trajo algo de su casa.</p>
+    <div class="acciones">
+      <button type="button" class="boton-compartir" data-compartir><span data-compartir-texto>Compartir el catálogo</span></button>
+      <a class="boton-wa wa" id="enviar-wa" target="_blank" rel="noopener">Enviar por WhatsApp</a>
+    </div>
+    <span class="sr" id="aviso-compartir" aria-live="polite"></span>
+  </div>
+</section>
 
 <footer class="rodape">
   <div class="envoltura">
@@ -426,6 +455,8 @@ const CATEGORIAS=[...new Set(EXPOSITORES.map(n=>n.categoria))].sort((a,b)=>(a===
 const ICONO_WA='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12.5" cy="11.5" r="8.5" fill="#fff"/><path d="M6.2 16.8 3.5 21l4.9-1.6z" fill="#fff"/><path d="M9.3 7.4c.3-.3.8-.2 1 .1l1 1.8c.2.3.1.7-.2 1l-.6.6c.6 1.2 1.5 2.1 2.7 2.7l.6-.6c.3-.3.7-.3 1-.2l1.8 1c.4.2.4.7.1 1l-.8.8c-.6.6-1.5.8-2.3.5-2.3-.9-4.1-2.7-5-5-.3-.8-.1-1.7.5-2.3z" fill="#04893D"/></svg>';
 const ICONO_IG='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.2" fill="#fff" stroke="none"/></svg>';
 const ICONO_PAUSA='<svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><rect x="2" y="1" width="3" height="10" fill="#000"/><rect x="7" y="1" width="3" height="10" fill="#000"/></svg>';
+// Compartir: caja abierta con flecha hacia arriba, en el color del texto del botón
+const ICONO_COMPARTIR='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 8l5-5 5 5M5 12v8h14v-8"/></svg>';
 const ICONO_X='<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 3l14 14M17 3 3 17" stroke="#000" stroke-width="2"/></svg>';
 
 // Com foto, o <img> substitui o padrão e a sigla (a tinta só está medida contra a rampa).
@@ -566,6 +597,31 @@ function limpiar(){
 // Montagem
 document.querySelectorAll("[data-rafaga]").forEach(el=>{el.innerHTML=rafaga()});
 document.querySelectorAll("[data-icono-ig]").forEach(el=>el.insertAdjacentHTML("afterbegin",ICONO_IG));
+
+// Compartir: menú del sistema donde existe (celulares); si no, copia el link.
+// Siempre se comparte la URL canónica, no location.href (evita ?parámetros o localhost).
+const URL_SITIO=document.querySelector('link[rel="canonical"]').href;
+const TEXTO_COMPARTIR="Mira el catálogo del Mercadito Foráneo de ADEFA: 30 sep y 1 oct en el Salón San Pablo II, Anáhuac México Norte. Comida, postres, moda y más de estudiantes de toda la República.";
+const puedeCompartir=typeof navigator.share==="function";
+const avisoCompartir=$("aviso-compartir");
+$("enviar-wa").href=`https://wa.me/?text=${encodeURIComponent(`${TEXTO_COMPARTIR} ${URL_SITIO}`)}`;
+$("enviar-wa").insertAdjacentHTML("afterbegin",ICONO_WA);
+document.querySelectorAll("[data-compartir]").forEach(b=>{
+  b.insertAdjacentHTML("afterbegin",ICONO_COMPARTIR);
+  const etiqueta=b.querySelector("[data-compartir-texto]");
+  const original=puedeCompartir?etiqueta.textContent:"Copiar link";
+  etiqueta.textContent=original;
+  b.addEventListener("click",async()=>{
+    if(puedeCompartir){
+      try{await navigator.share({title:"Mercadito Foráneo · 30 sep y 1 oct",text:TEXTO_COMPARTIR,url:URL_SITIO})}catch(e){}
+      return;
+    }
+    try{await navigator.clipboard.writeText(URL_SITIO);etiqueta.textContent="¡Link copiado!"}
+    catch(e){etiqueta.textContent=URL_SITIO.replace(/^https:\/\//,"").replace(/\/$/,"")}
+    avisoCompartir.textContent=etiqueta.textContent;
+    setTimeout(()=>{etiqueta.textContent=original;avisoCompartir.textContent=""},2500);
+  });
+});
 document.querySelector("[data-flecha-leyenda]").insertAdjacentHTML("afterbegin",flecha("currentColor"));
 const dato=(k,v)=>{document.querySelector(`[data-dato="${k}"]`).textContent=v};
 dato("total",EXPOSITORES.length);

@@ -24,7 +24,7 @@ export const ALIAS_PASTAS = {
 // Fotos que están en la carpeta de un negocio pero no son suyas. No se borran de
 // fotos-originais/; solo se ignoran. Ruta: "<pasta>/<fichero>".
 export const EXCLUIR_FOTOS = new Set([
-  "MARÍA FERNANDA/WhatsApp Image 2026-09-23 at 10.49.48 AM.jpeg",  // logo "SS Fitness", no es de Bony's Store
+  "MARÍA FERNANDA/WhatsApp Image 2026-09-23 at 10.49.48 AM.jpeg",  // logo "SS Fitness" de SportStyle; copiado a MARGARITA SOTO
 ].map(r => r.normalize("NFC")));
 
 export const caminhoFoto = (id, k) => `${PASTA_SAIDA}/${id}-${k}.webp`;

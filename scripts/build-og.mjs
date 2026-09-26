@@ -36,7 +36,7 @@ h1{margin-top:12px;font:700 100px/.9 "Zilla Slab";letter-spacing:-2.5px}
 <p class="ante">ADEFA · Anáhuac México Norte</p>
 <h1>Mercadito<br>Foráneo</h1>
 <p class="lema">Lo que trajimos de casa</p>
-<p class="info">30 sep y 1 oct · Salón San Pablo II</p>
+<p class="info">30 sep y 1 oct · Salón San Juan Pablo II</p>
 <div class="franja">${RAMPA.slice(1, 7).map(c => `<i style="background:${c}"></i>`).join("")}</div>
 </body></html>`;
 

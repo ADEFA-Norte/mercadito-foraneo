@@ -91,7 +91,7 @@ a{color:inherit}
   .chips{flex-wrap:wrap;overflow:visible;margin:0;padding:0;-webkit-mask-image:none!important;mask-image:none!important}
 }
 /* desktop largo: há roda do rato, a barra não precisa de acompanhar; o cabeçalho continua fixo */
-@media (min-width:1100px){.filtros{position:static}}
+@media (min-width:900px){.filtros{position:static}}
 
 /* Grade */
 main .envoltura{padding-top:20px;padding-bottom:56px}
@@ -572,7 +572,7 @@ chips.addEventListener("scroll",sombrasChips,{passive:true});
 addEventListener("resize",sombrasChips);
 // 1 · scroll-padding-top = cabeçalho + barra de filtros, para o foco nunca ficar tapado
 const cabecera=document.querySelector(".cabecera"),barra=document.querySelector(".filtros");
-// Acima de 1100px a barra deixa de ser fixa e só conta o cabeçalho
+// Acima de 900px a barra deixa de ser fixa e só conta o cabeçalho
 const medirBarra=()=>document.documentElement.style.setProperty("--alto-barra",`${cabecera.offsetHeight+(getComputedStyle(barra).position==="sticky"?barra.offsetHeight:0)}px`);
 new ResizeObserver(medirBarra).observe(barra);
 addEventListener("resize",medirBarra);

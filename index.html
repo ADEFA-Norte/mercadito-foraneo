@@ -23,13 +23,16 @@
   --gutter:16px;
 }
 *,*::before,*::after{box-sizing:border-box;border-radius:0}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:calc(var(--alto-barra,205px) + 12px)}
 body{margin:0;background:var(--fondo);color:var(--negro);font:400 16px/1.45 var(--jost);-webkit-font-smoothing:antialiased}
 button,input,select{font:inherit;color:inherit}
 a{color:inherit}
 :focus{outline:none}
 :focus-visible{outline:2px solid var(--sistema);outline-offset:2px}
 .envoltura{max-width:1200px;margin:0 auto;padding:0 var(--gutter)}
+.saltar{position:absolute;left:8px;top:8px;z-index:50;padding:12px 16px;background:var(--papel);border:1px solid var(--negro);font:500 14px/1 var(--jost);transform:translateY(-200%)}
+.saltar:focus{transform:none}
+#catalogo:focus{outline:none}
 .flecha{display:inline-block;height:13px;width:7.7px;flex:none;vertical-align:-1px}
 
 /* Header */
@@ -53,42 +56,66 @@ a{color:inherit}
 .datos span{display:block;margin-top:4px;font:400 14px/1.3 var(--jost);color:var(--gris)}
 @media (min-width:700px){.datos{grid-template-columns:repeat(4,1fr)}.hero .envoltura{padding-top:72px;padding-bottom:64px}}
 
-/* Filtros */
+/* Filtros — no telemóvel só a linha de busca é fixa; chips e legenda vão para a gaveta */
 .filtros{position:sticky;top:60px;z-index:20;background:var(--fondo);border-bottom:1px solid var(--linea)}
-.filtros .envoltura{padding-top:12px;padding-bottom:10px;display:grid;gap:10px}
+.filtros .envoltura{padding-top:8px;padding-bottom:8px;display:grid;gap:10px}
 .fila{display:flex;gap:8px;align-items:center}
-.busca{flex:1 1 auto;min-width:0;height:44px;padding:0 12px;border:1px solid var(--linea);background:var(--papel);-webkit-appearance:none;appearance:none}
+.busca{flex:1 1 auto;min-width:0;height:44px;padding:0 12px;border:1px solid var(--gris);background:var(--papel);-webkit-appearance:none;appearance:none}
 .busca::placeholder{color:var(--gris)}
 .estados[hidden]{display:none}
-.estados{flex:0 0 auto;max-width:44%;height:44px;padding:0 32px 0 12px;border:1px solid var(--linea);background:var(--papel) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23000'/%3E%3C/svg%3E") no-repeat right 12px center;-webkit-appearance:none;appearance:none;text-overflow:ellipsis}
-.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1 * var(--gutter));padding:2px var(--gutter)}
+.estados{flex:0 0 auto;max-width:44%;height:44px;padding:0 32px 0 12px;border:1px solid var(--gris);background:var(--papel) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23000'/%3E%3C/svg%3E") no-repeat right 12px center;-webkit-appearance:none;appearance:none;text-overflow:ellipsis}
+.abrir-filtros{flex:none;height:44px;padding:0 12px;border:1px solid var(--gris);background:var(--papel);font:500 14px/1 var(--jost);cursor:pointer;white-space:nowrap}
+.abrir-filtros[aria-expanded="true"]{background:var(--negro);border-color:var(--negro);color:#fff}
+.contador{flex:none;font:500 13px/1.3 var(--jost);color:var(--negro);white-space:nowrap}
+.contador .largo{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.cajon{display:none;gap:10px}
+.cajon.abierto{display:grid}
+/* padding-block de 6px: o anel de foco (2px + 2px de afastamento) não fica cortado pelo overflow */
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:-4px calc(-1 * var(--gutter));padding:6px var(--gutter)}
 .chips::-webkit-scrollbar{display:none}
+.chips.mas-der{-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 40px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 40px),transparent)}
+.chips.mas-izq{-webkit-mask-image:linear-gradient(to right,transparent,#000 40px);mask-image:linear-gradient(to right,transparent,#000 40px)}
+.chips.mas-izq.mas-der{-webkit-mask-image:linear-gradient(to right,transparent,#000 40px,#000 calc(100% - 40px),transparent);mask-image:linear-gradient(to right,transparent,#000 40px,#000 calc(100% - 40px),transparent)}
 .chip{flex:none;display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border:1px solid var(--linea);background:var(--papel);font:400 14px/1 var(--jost);cursor:pointer;white-space:nowrap}
 .chip .flecha{color:var(--acento)}
 .chip[aria-pressed="true"]{background:var(--acento);border-color:var(--acento);color:#fff}
 .chip[aria-pressed="true"] .flecha{color:#fff}
 .chip.foraneo{margin-right:6px}
-.pie-filtros{display:flex;justify-content:space-between;align-items:center;gap:12px;font:400 13px/1.3 var(--jost);color:var(--gris)}
-.leyenda{display:inline-flex;align-items:center;gap:6px}
+.leyenda{display:inline-flex;align-items:center;gap:6px;font:400 13px/1.3 var(--jost);color:var(--gris)}
 .leyenda .flecha{color:var(--acento)}
-.contador{font-weight:500;color:var(--negro);white-space:nowrap}
+@media (min-width:700px){
+  .filtros .envoltura{padding-top:12px;padding-bottom:10px}
+  .abrir-filtros{display:none}
+  .contador .largo{position:static;width:auto;height:auto;overflow:visible;clip:auto}
+  .cajon,.cajon.abierto{display:grid}
+  .chips{flex-wrap:wrap;overflow:visible;margin:0;padding:0;-webkit-mask-image:none!important;mask-image:none!important}
+}
+/* desktop largo: há roda do rato, a barra não precisa de acompanhar; o cabeçalho continua fixo */
+@media (min-width:1100px){.filtros{position:static}}
 
 /* Grade */
 main .envoltura{padding-top:20px;padding-bottom:56px}
-.grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:1px;background:var(--linea);border:1px solid var(--linea)}
+.grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1px;background:var(--linea);border:1px solid var(--linea)}
 .tarjeta{display:flex;flex-direction:column;width:100%;margin:0;padding:0;border:0;background:var(--papel);text-align:left;cursor:pointer}
 .tarjeta span{display:block}
-.tile{position:relative;overflow:hidden;aspect-ratio:1/1;width:100%}
+.tile{position:relative;overflow:hidden;aspect-ratio:1/1;width:100%;container-type:inline-size}
 .tile>svg,.tile>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.sigla{position:absolute;inset:0;display:flex!important;align-items:center;justify-content:center;font:700 64px/1 var(--zilla);letter-spacing:-1px}
+.sigla{position:absolute;inset:0;display:flex!important;align-items:center;justify-content:center;font:700 64px/1 var(--zilla);font-size:clamp(32px,28cqi,64px);letter-spacing:-1px}
 .etq-stand{position:absolute;left:0;bottom:0;padding:6px 10px;background:var(--papel);font:500 12px/1 var(--jost);letter-spacing:.04em}
 .etq-origen{position:absolute;left:0;top:0;display:flex!important;align-items:center;gap:6px;padding:7px 10px;background:var(--papel);border-right:1px solid var(--linea);border-bottom:1px solid var(--linea);font:600 12.5px/1 var(--zilla)}
 .etq-origen .flecha{color:var(--acento)}
-.cuerpo{flex:1;display:flex!important;flex-direction:column;padding:14px 14px 12px}
-.nombre{font:700 19px/1.15 var(--zilla);letter-spacing:-.2px}
-.desc{margin-top:6px;font:300 14px/1.4 var(--jost);color:var(--gris);display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.pie-tarjeta{margin-top:auto;padding-top:12px;display:flex!important;justify-content:space-between;gap:8px;font:400 13px/1.2 var(--jost)}
-.pie-tarjeta .cat{color:var(--gris)}
+.cuerpo{flex:1;display:flex!important;flex-direction:column;padding:10px 10px 10px}
+.nombre{font:700 16px/1.15 var(--zilla);letter-spacing:-.2px}
+.desc{margin-top:4px;font:300 14px/1.4 var(--jost);color:var(--gris);display:-webkit-box!important;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.pie-tarjeta{margin-top:auto;padding-top:8px;display:flex!important;flex-direction:column;gap:2px;font:400 13px/1.2 var(--jost)}
+.pie-tarjeta .cat{color:var(--gris);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (min-width:700px){
+  .grade{grid-template-columns:repeat(auto-fill,minmax(238px,1fr))}
+  .cuerpo{padding:14px 14px 12px}
+  .nombre{font-size:19px}
+  .desc{margin-top:6px;-webkit-line-clamp:2}
+  .pie-tarjeta{padding-top:12px;flex-direction:row;justify-content:space-between;gap:8px}
+}
 .pie-tarjeta .rango{font-weight:500;white-space:nowrap}
 .tarjeta:hover .nombre{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
 .vacio{grid-column:1/-1;background:var(--papel);padding:48px 20px;text-align:center}
@@ -99,7 +126,8 @@ main .envoltura{padding-top:20px;padding-bottom:56px}
 .ficha{padding:0;border:0;background:transparent;max-width:none;max-height:none;margin:0;width:100%;inset:auto 0 0 0;color:var(--negro)}
 .ficha::backdrop{background:rgba(0,0,0,.55)}
 .hoja{background:var(--papel);max-height:92vh;max-height:92dvh;overflow-y:auto;overscroll-behavior:contain;position:relative;animation:subir .24s ease-out}
-.cerrar{position:absolute;z-index:2;top:10px;right:10px;width:40px;height:40px;border:0;background:var(--papel);cursor:pointer;display:flex;align-items:center;justify-content:center}
+/* sticky dentro da .hoja (que é quem rola): o fechar acompanha o scroll */
+.cerrar{position:sticky;z-index:3;top:10px;margin:10px 10px -50px auto;width:40px;height:40px;border:0;background:var(--papel);cursor:pointer;display:flex;align-items:center;justify-content:center}
 .ficha .tile{aspect-ratio:16/9}
 .ficha .sigla{font-size:72px}
 .ficha-cuerpo{--pad:var(--gutter);padding:20px var(--pad) calc(20px + env(safe-area-inset-bottom))}
@@ -109,21 +137,31 @@ main .envoltura{padding-top:20px;padding-bottom:56px}
 .pildora{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:6px 10px;border:1px solid var(--linea);font:600 13px/1 var(--zilla)}
 .pildora .flecha{color:var(--acento)}
 .ficha .texto{margin:14px 0 0;font:300 16px/1.5 var(--jost)}
+.ficha .texto.recortado{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+.leer-mas{margin-top:4px;padding:10px 0;border:0;background:none;font:500 15px/1 var(--jost);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;cursor:pointer}
+.ficha-cuerpo:has(.contacto){padding-bottom:0!important}
 .fotos{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:1px;margin-top:16px;background:var(--linea);scrollbar-width:none;overscroll-behavior-x:contain}
 .fotos::-webkit-scrollbar{display:none}
 /* min-width:0 e align-self: sem eles, o flex item com aspect-ratio cresce até à largura natural da foto */
 .fotos img{display:block;scroll-snap-align:start;flex:0 0 100%;min-width:0;align-self:flex-start;aspect-ratio:1/1;object-fit:contain}
-.puntos{display:flex;justify-content:center;gap:6px;margin-top:10px}
-.puntos span{width:6px;height:6px;background:var(--linea)}
-.puntos span.activo{background:var(--negro)}
+.controles{position:relative;margin-top:6px;min-height:32px}
+/* padding lateral simétrico: os pontos não mudam de sítio quando a pausa desaparece */
+.puntos{display:flex;flex-wrap:wrap;justify-content:center;padding:0 36px}
+.punto{width:24px;height:24px;padding:0;border:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.punto::before{content:"";width:8px;height:8px;border:1px solid var(--gris);background:var(--papel)}
+.punto.activo::before{background:var(--negro);border-color:var(--negro)}
+.pausa{position:absolute;right:0;top:0;width:32px;height:32px;border:1px solid var(--gris);background:var(--papel);cursor:pointer;display:flex;align-items:center;justify-content:center}
 .meta{margin:22px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--linea);border:1px solid var(--linea)}
 .meta div{background:var(--papel);padding:10px 12px}
 .meta div:last-child:nth-child(odd){grid-column:1/-1}
 .meta dt{font:400 12px/1.2 var(--jost);color:var(--gris);text-transform:uppercase;letter-spacing:.06em}
 .meta dd{margin:4px 0 0;font:500 15px/1.3 var(--jost)}
-.contacto{margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.contacto a{display:flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:0 10px;border:0;text-decoration:none;font:500 15px/1.1 var(--jost);color:#fff;text-align:center;overflow-wrap:anywhere}
-.contacto.uno{grid-template-columns:1fr}
+/* barra de contacto fixa no fundo da folha */
+.contacto{position:sticky;bottom:0;z-index:2;margin:20px calc(-1 * var(--pad)) 0;padding:12px var(--pad) calc(12px + env(safe-area-inset-bottom));background:var(--papel);border-top:1px solid var(--linea);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.contacto a{display:flex;align-items:center;justify-content:center;gap:8px;min-width:0;min-height:50px;padding:0 10px;border:0;text-decoration:none;font:500 15px/1.1 var(--jost);color:#fff;text-align:center}
+/* o handle nunca parte a meio: se não couber, reticências; o texto completo fica no title */
+.contacto .handle{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.contacto.uno{grid-template-columns:minmax(0,1fr)}
 .contacto svg{width:20px;height:20px;flex:none}
 .wa{background:#04893D;color:#fff}
 .ig{background:linear-gradient(135deg,#DD2A7B 0%,#8134AF 55%,#515BD4 100%);color:#fff}
@@ -155,6 +193,8 @@ main .envoltura{padding-top:20px;padding-bottom:56px}
 </head>
 <body>
 
+<a class="saltar" href="#catalogo">Saltar al catálogo</a>
+
 <header class="cabecera">
   <div class="envoltura">
     <a class="marca" href="#"><span class="rafaga" data-rafaga></span>Mercadito Foráneo</a>
@@ -167,7 +207,7 @@ main .envoltura{padding-top:20px;padding-bottom:56px}
   <div class="envoltura">
     <p class="antetitulo">ADEFA · Anáhuac México Norte</p>
     <h1>Lo que trajimos de casa</h1>
-    <p class="sub">Comida, moda y arte hechos por estudiantes que vienen de toda la República, y por los de aquí. Dos días en la explanada central, de 10:00 a 18:00.</p>
+    <p class="sub">Comida, moda y arte hechos por estudiantes que vienen de toda la República, y por los de aquí. Dos días en la explanada central: miércoles 30 de septiembre de 11:30 a 18:00 y jueves 1 de octubre de 10:00 a 18:00.</p>
     <ul class="datos">
       <li><b data-dato="total"></b><span>negocios</span></li>
       <li><b data-dato="foraneos"></b><span>foráneos</span></li>
@@ -184,16 +224,17 @@ main .envoltura{padding-top:20px;padding-bottom:56px}
       <input id="busca" class="busca" type="search" placeholder="Buscar tamales, café, aretes…" autocomplete="off">
       <label class="sr" for="estado">Estado de origen</label>
       <select id="estado" class="estados" hidden><option value="">Todos los estados</option></select>
-    </div>
-    <div class="chips" id="chips" role="group" aria-label="Filtrar por categoría"></div>
-    <div class="pie-filtros">
-      <span class="leyenda" data-flecha-leyenda>señala a los negocios foráneos</span>
+      <button type="button" class="abrir-filtros" id="abrir-filtros" aria-expanded="false" aria-controls="cajon">Filtros</button>
       <span class="contador" id="contador" aria-live="polite"></span>
+    </div>
+    <div class="cajon" id="cajon">
+      <div class="chips" id="chips" role="group" aria-label="Filtrar por categoría"></div>
+      <span class="leyenda" data-flecha-leyenda>señala a los negocios foráneos</span>
     </div>
   </div>
 </div>
 
-<main>
+<main id="catalogo" tabindex="-1">
   <div class="envoltura">
     <div class="grade" id="grade"></div>
   </div>
@@ -207,7 +248,7 @@ main .envoltura{padding-top:20px;padding-bottom:56px}
     </div>
     <div>
       <h2>Cuándo</h2>
-      <p>Miércoles 30 de septiembre y jueves 1 de octubre de 2026, de 10:00 a 18:00.</p>
+      <p>Miércoles 30 de septiembre, de 11:30 a 18:00.<br>Jueves 1 de octubre, de 10:00 a 18:00.</p>
     </div>
     <div>
       <h2>Pagos</h2>
@@ -275,10 +316,11 @@ const EXPOSITORES=[
   {"id":"E-008","nombre":"Antoj Lab","categoria":"Comida y botanas","foraneo":true,"estado":"","desc":"Esquites, matcha, tostiesquites y aguas frescas de horchata y jamaica","desc_full":"Esquites, matcha, tostiesquites y aguas frescas de horchata y jamaica","rango":"$45 – $140","stand":"","pagos":"","wa":"526562536534","ig":"antoj.lab","fotos":[]},
   {"id":"E-009","nombre":"Balumstudio","categoria":"Moda","foraneo":true,"estado":"","desc":"Ropa deportiva de mujer: top, leggings y chamarras de compresión","desc_full":"Ropa deportiva de mujer: top, leggings y chamarras de compresión","rango":"$140 – $690","stand":"","pagos":"","wa":"527222455270","ig":"balumstudio","fotos":[]},
   {"id":"E-010","nombre":"Cosechabendita","categoria":"Comida y botanas","foraneo":true,"estado":"","desc":"Chips vegetales ( malangas ,pepino ,jicamas, zanahoria, plátanos)","desc_full":"Chips vegetales ( malangas ,pepino ,jicamas, zanahoria, plátanos)","rango":"$65 – $100","stand":"","pagos":"","wa":"522211671481","ig":"cosechabendita","fotos":[]},
-  {"id":"E-011","nombre":"Maria Formiga Mx Br","categoria":"Postres y pan","foraneo":true,"estado":"","desc":"Brigadeiros artesanales brasileños: bocados de chocolate y leche condensada enrollados a mano, sin gluten y sin conservadores. Muchos sabores, cajas de regalo y…","desc_full":"Brigadeiros artesanales brasileños: bocados de chocolate y leche condensada enrollados a mano, sin gluten y sin conservadores. Muchos sabores, cajas de regalo y charolas para eventos, con personalización de colores según las preferencias del cliente","rango":"","stand":"","pagos":"","wa":"525611097807","ig":"maria_formiga_mx_br","fotos":[]},
+  {"id":"E-011","nombre":"Maria Formiga Mx Br","categoria":"Postres y pan","foraneo":true,"estado":"","desc":"Brigadeiros artesanales brasileños: bocados de chocolate y leche condensada enrollados a mano, sin gluten y sin conservadores. Muchos sabores, cajas de regalo y…","desc_full":"Brigadeiros artesanales brasileños: bocados de chocolate y leche condensada enrollados a mano, sin gluten y sin conservadores. Muchos sabores, cajas de regalo y charolas para eventos, con personalización de colores según las preferencias del cliente","rango":"$25 – $350","stand":"","pagos":"","wa":"525611097807","ig":"maria_formiga_mx_br","fotos":[]},
   {"id":"E-012","nombre":"Lucky Things8","categoria":"Juguetes y coleccionables","foraneo":true,"estado":"","desc":"Squishies, slimes, stickers, owalas, fugglers y llaveros :)","desc_full":"Squishies, slimes, stickers, owalas, fugglers y llaveros :)","rango":"$50 – $350","stand":"","pagos":"","wa":"527227073018","ig":"lucky_things8","fotos":["img/expositores/E-012-1.webp"]},
   {"id":"E-013","nombre":"Sofía Giménez Rodríguez","categoria":"Postres y pan","foraneo":true,"estado":"","desc":"Hago galletas monchosas de diferentes sabores desde hace muchooo, hago sabores como chispas con Nutella, red velvet, smore’s, cookies and cream, brookies, lotus, peanut…","desc_full":"Hago galletas monchosas de diferentes sabores desde hace muchooo, hago sabores como chispas con Nutella, red velvet, smore’s, cookies and cream, brookies, lotus, peanut butter…","rango":"$50 – $90","stand":"","pagos":"","wa":"527774299259","ig":"","fotos":["img/expositores/E-013-1.webp"]},
   {"id":"E-014","nombre":"Juan José Vázquez Acosta","categoria":"Joyería y accesorios","foraneo":true,"estado":"","desc":"Joyería de plata y accesorios varios","desc_full":"Joyería de plata y accesorios varios","rango":"$150 – $2,500","stand":"","pagos":"","wa":"524811136408","ig":"","fotos":["img/expositores/E-014-1.webp"]},
+  {"id":"E-063","nombre":"Espacio Brasil","categoria":"Postres y pan","foraneo":true,"estado":"","desc":"Pasteles y dulces brasileños: trufas de chocolate, coco, fresa, churros y nido, brochetas y vasos de frutas con chocolate.","desc_full":"Pasteles y dulces brasileños: trufas de chocolate, coco, fresa, churros y nido, brochetas y vasos de frutas con chocolate.","rango":"Desde $15","stand":"","pagos":"Efectivo, transferencia y tarjeta","wa":"525549574864","ig":"su_martins_mar","fotos":[]},
   {"id":"E-015","nombre":"Bolbeck accesorios","categoria":"Juguetes y coleccionables","foraneo":false,"estado":"","desc":"Pines, llaveros metálicos, llaveros de peluche y Dupe de Termos Owala","desc_full":"Pines, llaveros metálicos, llaveros de peluche y Dupe de Termos Owala","rango":"$10 – $500","stand":"","pagos":"","wa":"525516966600","ig":"bolbeck_accesorios","fotos":["img/expositores/E-015-1.webp"]},
   {"id":"E-016","nombre":"Eliette candle shop","categoria":"Hogar y velas","foraneo":false,"estado":"","desc":"Velas, galletas y artículos de Navidad","desc_full":"Velas, galletas y artículos de Navidad","rango":"$45 – $900","stand":"","pagos":"","wa":"525569698653","ig":"eliettecandleshop","fotos":[]},
   {"id":"E-017","nombre":"Palomawers Palomas Gourmet","categoria":"Comida y botanas","foraneo":false,"estado":"","desc":"Palomitas Gourmet artesanales realizadas sin conservadores de sabores dulces y salados","desc_full":"Palomitas Gourmet artesanales realizadas sin conservadores de sabores dulces y salados","rango":"$50","stand":"","pagos":"","wa":"525529357380","ig":"palomawers_gourmet","fotos":["img/expositores/E-017-1.webp","img/expositores/E-017-2.webp","img/expositores/E-017-3.webp","img/expositores/E-017-4.webp","img/expositores/E-017-5.webp"]},
@@ -324,9 +366,10 @@ const EXPOSITORES=[
   {"id":"E-057","nombre":"Accsmels","categoria":"Joyería y accesorios","foraneo":false,"estado":"","desc":"Joyería","desc_full":"Joyería","rango":"$149 – $399","stand":"","pagos":"","wa":"525551983520","ig":"accsmels","fotos":["img/expositores/E-057-1.webp","img/expositores/E-057-2.webp","img/expositores/E-057-3.webp","img/expositores/E-057-4.webp","img/expositores/E-057-5.webp"]},
   {"id":"E-058","nombre":"Mia Gaitán Skincare","categoria":"Belleza y cuidado","foraneo":false,"estado":"","desc":"Productos Mexicanos de Bio Cosmética Vegana de Autor, hechos con detalle de manera Artesanal para el cuidado de la piel con protocolos completos de Skincare faciales…","desc_full":"Productos Mexicanos de Bio Cosmética Vegana de Autor, hechos con detalle de manera Artesanal para el cuidado de la piel con protocolos completos de Skincare faciales, corporales y capilares, con activos de alta gama.","rango":"$90 – $590","stand":"","pagos":"","wa":"525513640358","ig":"","fotos":["img/expositores/E-058-1.webp","img/expositores/E-058-2.webp"]},
   {"id":"E-059","nombre":"Joyils","categoria":"Joyería y accesorios","foraneo":false,"estado":"","desc":"Joyería en acero inoxidable","desc_full":"Joyería en acero inoxidable","rango":"$50 – $350","stand":"","pagos":"","wa":"527224682766","ig":"ilishopmx","fotos":["img/expositores/E-059-1.webp","img/expositores/E-059-2.webp","img/expositores/E-059-3.webp","img/expositores/E-059-4.webp","img/expositores/E-059-5.webp","img/expositores/E-059-6.webp","img/expositores/E-059-7.webp","img/expositores/E-059-8.webp","img/expositores/E-059-9.webp","img/expositores/E-059-10.webp","img/expositores/E-059-11.webp","img/expositores/E-059-12.webp"]},
-  {"id":"E-060","nombre":"Bolita Pet","categoria":"Otros","foraneo":false,"estado":"","desc":"Mascotas: collares personalizados para mascota.","desc_full":"Mascotas: collares personalizados para mascota.","rango":"$250 – $600","stand":"","pagos":"","wa":"525572247807","ig":"bolitapet.mx","fotos":["img/expositores/E-060-1.webp","img/expositores/E-060-2.webp","img/expositores/E-060-3.webp"]},
+  {"id":"E-060","nombre":"Bolita Pet","categoria":"Mascotas","foraneo":false,"estado":"","desc":"Collares personalizados para mascota","desc_full":"Collares personalizados para mascota","rango":"$250 – $600","stand":"","pagos":"","wa":"525572247807","ig":"bolitapet.mx","fotos":["img/expositores/E-060-1.webp","img/expositores/E-060-2.webp","img/expositores/E-060-3.webp"]},
   {"id":"E-061","nombre":"Arty Naykary & Culture","categoria":"Moda","foraneo":false,"estado":"","desc":"Arty Naykary & Culture es un proyecto de arte portable: chamarras de mezclilla intervenidas y pintadas a mano por artistas mexicanos, donde cada pieza es única e…","desc_full":"Arty Naykary & Culture es un proyecto de arte portable: chamarras de mezclilla intervenidas y pintadas a mano por artistas mexicanos, donde cada pieza es única e irrepetible. Partimos de una convicción central que el arte no debe permanecer confinado a la pared de un museo, sino habitar el cuerpo y caminar con quien lo porta. Nuestras colecciones reinterpretan, con rigor y respeto, obras de referentes como Remedios Varo, Leonora Carrington, Frida Kahlo y Salvador Dalí, además de motivos derivados de cosmovisiones culturales mexicanas, trasladados directamente sobre la prenda mediante técnica pictórica artesanal. El proyecto se sostiene sobre un compromiso de trabajo colaborativo y trato justo: un equipo de cinco pintores y dos costureras mexicanas da forma a cada pieza, a lo que se suman colaboraciones en telas, encajes y bordados que amplían el lenguaje textil de la marca. Contamos también con piezas de impresión digital, pensadas para ofrecer un punto de entrada más accesible sin renunciar a la intención artística que define el proyecto.","rango":"$800 – $4,000","stand":"","pagos":"","wa":"525548036746","ig":"artynaykaryculture","fotos":["img/expositores/E-061-1.webp","img/expositores/E-061-2.webp","img/expositores/E-061-3.webp","img/expositores/E-061-4.webp","img/expositores/E-061-5.webp","img/expositores/E-061-6.webp","img/expositores/E-061-7.webp","img/expositores/E-061-8.webp","img/expositores/E-061-9.webp","img/expositores/E-061-10.webp"]},
-  {"id":"E-062","nombre":"A&M Shopping Perfumería Original / papel arroz","categoria":"Belleza y cuidado","foraneo":false,"estado":"","desc":"Perfumes y sets originales","desc_full":"Perfumes y sets originales","rango":"$20 – $3,500","stand":"","pagos":"","wa":"525616372511","ig":"","fotos":["img/expositores/E-062-1.webp","img/expositores/E-062-2.webp","img/expositores/E-062-3.webp"]}
+  {"id":"E-062","nombre":"A&M Shopping Perfumería Original / papel arroz","categoria":"Belleza y cuidado","foraneo":false,"estado":"","desc":"Perfumes y sets originales","desc_full":"Perfumes y sets originales","rango":"$20 – $3,500","stand":"","pagos":"","wa":"525616372511","ig":"","fotos":["img/expositores/E-062-1.webp","img/expositores/E-062-2.webp","img/expositores/E-062-3.webp"]},
+  {"id":"E-064","nombre":"Bruno y Oli","categoria":"Mascotas","foraneo":false,"estado":"","desc":"Galletas y spreads para perro, 100% naturales, sin conservadores ni químicos añadidos.","desc_full":"Galletas y spreads para perro, 100% naturales, sin conservadores ni químicos añadidos.","rango":"$100 – $150","stand":"","pagos":"","wa":"527222644107","ig":"brunoyoli","fotos":[]}
 ];
 /* EXPOSITORES:fim */
 
@@ -344,6 +387,7 @@ const CATEGORIAS=[...new Set(EXPOSITORES.map(n=>n.categoria))].sort((a,b)=>(a===
 // Ícones de contato, desenhados com primitivas
 const ICONO_WA='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12.5" cy="11.5" r="8.5" fill="#fff"/><path d="M6.2 16.8 3.5 21l4.9-1.6z" fill="#fff"/><path d="M9.3 7.4c.3-.3.8-.2 1 .1l1 1.8c.2.3.1.7-.2 1l-.6.6c.6 1.2 1.5 2.1 2.7 2.7l.6-.6c.3-.3.7-.3 1-.2l1.8 1c.4.2.4.7.1 1l-.8.8c-.6.6-1.5.8-2.3.5-2.3-.9-4.1-2.7-5-5-.3-.8-.1-1.7.5-2.3z" fill="#04893D"/></svg>';
 const ICONO_IG='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.2" fill="#fff" stroke="none"/></svg>';
+const ICONO_PAUSA='<svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><rect x="2" y="1" width="3" height="10" fill="#000"/><rect x="7" y="1" width="3" height="10" fill="#000"/></svg>';
 const ICONO_X='<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 3l14 14M17 3 3 17" stroke="#000" stroke-width="2"/></svg>';
 
 // Com foto, o <img> substitui o padrão e a sigla (a tinta só está medida contra a rampa).
@@ -353,13 +397,14 @@ const tile=(n,conStand)=>{
   const p=patron(n.id);
   const fondo=n.fotos.length?`<img src="${esc(miniatura(n))}" alt="" loading="lazy" decoding="async">`
     :`${p.svg}<span class="sigla" style="color:${p.tinta}" aria-hidden="true">${esc(sigla(n.nombre))}</span>`;
-  return `<span class="tile">${fondo}${esForaneo(n)?`<span class="etq-origen">${flecha("currentColor")}${esc(origen(n))}</span>`:""}${conStand&&n.stand?`<span class="etq-stand">Stand ${esc(n.stand)}</span>`:""}</span>`;
+  const id=sufijo=>conStand?` id="${n.id}-${sufijo}"`:"";
+  return `<span class="tile">${fondo}${esForaneo(n)?`<span class="etq-origen"${id("o")}>${flecha("currentColor")}${esc(origen(n))}</span>`:""}${conStand&&n.stand?`<span class="etq-stand"${id("s")}>Stand ${esc(n.stand)}</span>`:""}</span>`;
 };
 
 // Estado dos filtros — acumulativos sobre a mesma lista
 const filtro={q:"",cat:"",foraneos:false,estado:""};
 const $=id=>document.getElementById(id);
-const grade=$("grade"),contador=$("contador"),busca=$("busca"),selEstado=$("estado"),chips=$("chips"),ficha=$("ficha"),hoja=$("hoja");
+const grade=$("grade"),contador=$("contador"),busca=$("busca"),selEstado=$("estado"),chips=$("chips"),ficha=$("ficha"),hoja=$("hoja"),botonFiltros=$("abrir-filtros"),cajon=$("cajon");
 
 function coincide(n){
   if(filtro.cat&&n.categoria!==filtro.cat)return false;
@@ -374,14 +419,32 @@ function coincide(n){
 
 function render(){
   const lista=EXPOSITORES.filter(coincide);
-  contador.textContent=`${lista.length} de ${EXPOSITORES.length} negocios`;
-  grade.innerHTML=lista.length?lista.map(n=>`<button type="button" class="tarjeta" data-id="${n.id}" aria-label="${esc(n.nombre)}${esForaneo(n)?(n.estado?", foráneo de "+esc(n.estado):", foráneo"):""}${n.stand?", stand "+esc(n.stand):""}">${tile(n,true)}<span class="cuerpo"><span class="nombre">${esc(n.nombre)}</span><span class="desc">${esc(n.desc)}</span><span class="pie-tarjeta"><span class="cat">${esc(n.categoria)}</span>${n.rango?`<span class="rango">${esc(n.rango)}</span>`:""}</span></span></button>`).join("")
+  contador.innerHTML=`${lista.length} de ${EXPOSITORES.length}<span class="largo"> negocios</span>`;
+  pintarBotonFiltros();
+  // Nome acessível: nome, origem, categoria e preço; a descrição fica como descrição.
+  const etiqueta=n=>[`${n.id}-n`,esForaneo(n)&&`${n.id}-o`,`${n.id}-c`,n.rango&&`${n.id}-r`,n.stand&&`${n.id}-s`].filter(Boolean).join(" ");
+  grade.innerHTML=lista.length?lista.map(n=>`<button type="button" class="tarjeta" data-id="${n.id}" aria-labelledby="${etiqueta(n)}" aria-describedby="${n.id}-d">${tile(n,true)}<span class="cuerpo"><span class="nombre" id="${n.id}-n">${esc(n.nombre)}</span><span class="desc" id="${n.id}-d">${esc(n.desc)}</span><span class="pie-tarjeta"><span class="cat" id="${n.id}-c">${esc(n.categoria)}</span>${n.rango?`<span class="rango" id="${n.id}-r">${esc(n.rango)}</span>`:""}</span></span></button>`).join("")
     :`<div class="vacio"><p>Ningún negocio coincide con tu búsqueda.</p><button type="button" data-limpiar>Limpiar filtros</button></div>`;
+}
+
+// Esbatido nas margens enquanto houver chips escondidos desse lado (só no telemóvel;
+// no desktop os chips quebram linha e não há overflow)
+function sombrasChips(){
+  const max=chips.scrollWidth-chips.clientWidth;
+  chips.classList.toggle("mas-izq",chips.scrollLeft>2);
+  chips.classList.toggle("mas-der",chips.scrollLeft<max-2);
+}
+
+// 1 · gaveta de filtros no telemóvel; o botão diz quantos filtros estão ativos
+function pintarBotonFiltros(){
+  const n=!!filtro.cat+filtro.foraneos+!!filtro.estado;
+  botonFiltros.textContent=n?`Filtros · ${n}`:"Filtros";
 }
 
 function pintarChips(){
   chips.innerHTML=`<button type="button" class="chip foraneo" data-foraneos aria-pressed="${filtro.foraneos}">${flecha("currentColor")}Solo foráneos</button>`
     +[["","Todas"],...CATEGORIAS.map(c=>[c,c])].map(([v,t])=>`<button type="button" class="chip" data-cat="${v}" aria-pressed="${filtro.cat===v}">${t}</button>`).join("");
+  sombrasChips();
 }
 
 function abrir(id){
@@ -389,12 +452,13 @@ function abrir(id){
   // Nenhum botão sem destino; se só houver um, ocupa a largura toda.
   const enlaces=[
     n.wa&&`<a class="wa" href="https://wa.me/${n.wa}?text=${encodeURIComponent(MENSAJE)}" target="_blank" rel="noopener">${ICONO_WA}WhatsApp</a>`,
-    n.ig&&`<a class="ig" href="https://instagram.com/${encodeURIComponent(n.ig)}" target="_blank" rel="noopener">${ICONO_IG}@${esc(n.ig)}</a>`
+    n.ig&&`<a class="ig" href="https://instagram.com/${encodeURIComponent(n.ig)}" target="_blank" rel="noopener" title="@${esc(n.ig)}">${ICONO_IG}<span class="handle">@${esc(n.ig)}</span></a>`
   ].filter(Boolean);
   const meta=[["Stand",n.stand],["Precios",n.rango],["Categoría",n.categoria],["Pagos",n.pagos]].filter(([,v])=>v);
   // contain: nada se recorta; el hueco toma el color base del patrón del negocio
   const base=patron(n.id).base;
-  const fotos=n.fotos.length?`<div class="fotos" role="group" aria-label="Fotos de ${esc(n.nombre)}" tabindex="0">${n.fotos.map((f,k)=>`<img src="${esc(f)}" style="background:${base}" alt="${esc(n.nombre)}, foto ${k+1} de ${n.fotos.length}" loading="lazy" decoding="async">`).join("")}</div>${n.fotos.length>1?`<div class="puntos" aria-hidden="true">${"<span></span>".repeat(n.fotos.length)}</div>`:""}`:"";
+  const controles=n.fotos.length>1?`<div class="controles"><div class="puntos" role="group" aria-label="Elegir foto">${n.fotos.map((_,k)=>`<button type="button" class="punto" aria-label="Foto ${k+1} de ${n.fotos.length}"></button>`).join("")}</div><button type="button" class="pausa" aria-label="Pausar fotos">${ICONO_PAUSA}</button></div>`:"";
+  const fotos=n.fotos.length?`<div class="fotos" role="group" aria-label="Fotos de ${esc(n.nombre)}" tabindex="0">${n.fotos.map((f,k)=>`<img src="${esc(f)}" style="background:${base}" alt="${esc(n.nombre)}, foto ${k+1} de ${n.fotos.length}" loading="lazy" decoding="async">`).join("")}</div>${controles}`:"";
   pararCarrusel();
   hoja.classList.toggle("con-fotos",!!fotos);
   hoja.innerHTML=`<button type="button" class="cerrar" data-cerrar aria-label="Cerrar">${ICONO_X}</button>
@@ -403,40 +467,57 @@ function abrir(id){
       <h2 id="ficha-nombre">${esc(n.nombre)}</h2>
       <span class="pildora">${esForaneo(n)?`${flecha("currentColor")}Foráneo${n.estado?" · "+esc(n.estado):""}`:"Local"}</span>
       ${fotos}
-      <p class="texto">${esc(n.desc_full)}</p>
+      <p class="texto recortado" id="ficha-texto">${esc(n.desc_full)}</p>
       <dl class="meta">${meta.map(([k,v])=>`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
       ${enlaces.length?`<div class="contacto${enlaces.length===1?" uno":""}">${enlaces.join("")}</div>`:""}
     </div>`;
   hoja.scrollTop=0;
   ficha.showModal();
+  recortarTexto();
   montarCarrusel();
+}
+
+// "Leer más" só quando o texto passa das 5 linhas; medido já com a ficha aberta
+function recortarTexto(){
+  const p=hoja.querySelector(".texto");
+  if(p.scrollHeight<=p.clientHeight+1){p.classList.remove("recortado");return}
+  p.insertAdjacentHTML("afterend",`<button type="button" class="leer-mas" aria-expanded="false" aria-controls="ficha-texto">Leer más</button>`);
 }
 
 // Carrossel da ficha: avança de 4 em 4 s e volta ao início. Para de vez ao
 // primeiro toque, arrasto, roda ou tecla, e ao fechar. Nunca nas tarjetas.
+// O botão de pausa só existe enquanto corre; depois de parar, desaparece.
 let carrusel=null;
 const movimientoReducido=matchMedia("(prefers-reduced-motion: reduce)");
-function pararCarrusel(){if(carrusel){clearInterval(carrusel);carrusel=null}}
+function pararCarrusel(){
+  if(!carrusel)return;
+  clearInterval(carrusel);carrusel=null;
+  const pausa=hoja.querySelector(".pausa");if(!pausa)return;
+  if(document.activeElement===pausa)(hoja.querySelector(".punto.activo")||hoja.querySelector(".fotos")).focus();
+  pausa.remove();
+}
 function montarCarrusel(){
   const tira=hoja.querySelector(".fotos");if(!tira)return;
-  const imgs=[...tira.children],puntos=[...hoja.querySelectorAll(".puntos span")];
+  const imgs=[...tira.children],puntos=[...hoja.querySelectorAll(".punto")];
   const izquierda=el=>el.getBoundingClientRect().left-tira.getBoundingClientRect().left;
   const actual=()=>{
     if(tira.scrollLeft>=tira.scrollWidth-tira.clientWidth-2)return imgs.length-1;
     let k=0;imgs.forEach((im,i)=>{if(Math.abs(izquierda(im))<Math.abs(izquierda(imgs[k])))k=i});
     return k;
   };
-  const pintar=()=>{const k=actual();puntos.forEach((p,i)=>p.classList.toggle("activo",i===k))};
+  const pintar=()=>{const k=actual();puntos.forEach((p,i)=>{p.classList.toggle("activo",i===k);i===k?p.setAttribute("aria-current","true"):p.removeAttribute("aria-current")})};
+  const irA=k=>tira.scrollTo({left:k?tira.scrollLeft+izquierda(imgs[k]):0,behavior:movimientoReducido.matches?"auto":"smooth"});
   tira.addEventListener("scroll",pintar,{passive:true});
+  puntos.forEach((p,i)=>p.addEventListener("click",()=>{pararCarrusel();irA(i)}));
   pintar();
-  if(imgs.length<2||movimientoReducido.matches)return;
-  carrusel=setInterval(()=>{
-    const k=(actual()+1)%imgs.length;
-    tira.scrollTo({left:k?tira.scrollLeft+izquierda(imgs[k]):0,behavior:"smooth"});
-  },4000);
+  const pausa=hoja.querySelector(".pausa");
+  if(imgs.length<2||movimientoReducido.matches){if(pausa)pausa.remove();return}
+  pausa.addEventListener("click",pararCarrusel);
+  carrusel=setInterval(()=>irA((actual()+1)%imgs.length),4000);
 }
 for(const ev of ["pointerdown","touchstart","wheel","keydown"])hoja.addEventListener(ev,pararCarrusel,{passive:true});
-ficha.addEventListener("close",pararCarrusel);
+// O "close" chega numa tarefa à parte: se entretanto já abriu outra ficha, não é para parar.
+ficha.addEventListener("close",()=>{if(!ficha.open)pararCarrusel()});
 
 function limpiar(){
   filtro.q="";filtro.cat="";filtro.foraneos=false;filtro.estado="";
@@ -472,8 +553,30 @@ grade.addEventListener("click",e=>{
   const t=e.target.closest(".tarjeta");if(t)abrir(t.dataset.id);
 });
 ficha.addEventListener("click",e=>{
-  if(e.target===ficha||e.target.closest("[data-cerrar]"))ficha.close();
+  if(e.target===ficha||e.target.closest("[data-cerrar]")){ficha.close();return}
+  const mas=e.target.closest(".leer-mas");
+  if(mas){
+    const abierto=mas.getAttribute("aria-expanded")!=="true";
+    hoja.querySelector(".texto").classList.toggle("recortado",!abierto);
+    mas.setAttribute("aria-expanded",abierto);
+    mas.textContent=abierto?"Leer menos":"Leer más";
+  }
 });
+botonFiltros.addEventListener("click",()=>{
+  const abierto=botonFiltros.getAttribute("aria-expanded")!=="true";
+  botonFiltros.setAttribute("aria-expanded",abierto);
+  cajon.classList.toggle("abierto",abierto);
+  sombrasChips();
+});
+chips.addEventListener("scroll",sombrasChips,{passive:true});
+addEventListener("resize",sombrasChips);
+// 1 · scroll-padding-top = cabeçalho + barra de filtros, para o foco nunca ficar tapado
+const cabecera=document.querySelector(".cabecera"),barra=document.querySelector(".filtros");
+// Acima de 1100px a barra deixa de ser fixa e só conta o cabeçalho
+const medirBarra=()=>document.documentElement.style.setProperty("--alto-barra",`${cabecera.offsetHeight+(getComputedStyle(barra).position==="sticky"?barra.offsetHeight:0)}px`);
+new ResizeObserver(medirBarra).observe(barra);
+addEventListener("resize",medirBarra);
+medirBarra();
 </script>
 </body>
 </html>

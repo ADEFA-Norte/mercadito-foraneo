@@ -30,7 +30,8 @@ const CATEGORIAS = [
   ["Importados y termos", ["owala", "hydrojug", "brumate", "importad", "termo"]],
 ];
 
-// Correções manuais, pela marca tal como aparece na folha
+// Correções manuais, pela marca tal como aparece na folha; para foráneos sem marca,
+// pelo nome gerado (o do Instagram capitalizado)
 const SOBREPOSICOES = {
   "MT 17 CAFE ARTESANAL": {
     rango: "$55 – $320",
@@ -44,10 +45,33 @@ const SOBREPOSICOES = {
   "Eliette candle shop": { categoria: "Hogar y velas" },
   "Paponas y enchilados": { categoria: "Comida y botanas" },
   "Peluches tu-tuy": { categoria: "Juguetes y coleccionables" },
-  // Fica em Otros para não criar um chip com um só negócio; "Mascotas" na desc para a busca.
-  "Bolita Pet": { categoria: "Otros", desc: "Mascotas: collares personalizados para mascota." },
+  "Bolita Pet": { categoria: "Mascotas" },
   "Holy Mustard": { categoria: "Moda" },
+  "Maria Formiga Mx Br": { rango: "$25 – $350" },
 };
+
+// Negócios que não estão na folha. Entram depois dos da folha, com os ids seguintes.
+const NOVOS_EXPOSITORES = [
+  {
+    nombre: "Espacio Brasil",
+    foraneo: true,
+    categoria: "Postres y pan",
+    desc: "Pasteles y dulces brasileños: trufas de chocolate, coco, fresa, churros y nido, brochetas y vasos de frutas con chocolate.",
+    rango: "Desde $15",
+    wa: "525549574864",
+    ig: "su_martins_mar",
+    pagos: "Efectivo, transferencia y tarjeta",
+  },
+  {
+    nombre: "Bruno y Oli",
+    foraneo: false,
+    categoria: "Mascotas",
+    desc: "Galletas y spreads para perro, 100% naturales, sin conservadores ni químicos añadidos.",
+    rango: "$100 – $150",
+    wa: "527222644107",
+    ig: "brunoyoli",
+  },
+];
 
 const texto = v => String(v ?? "").replace(/\s+/g, " ").trim();
 const escRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -154,13 +178,14 @@ export function lerExpositores() {
   brutos.sort((x, y) => y.foraneo - x.foraneo);
   const EXPOSITORES = brutos.map(({ foraneo, persona, marca, nomeReserva, divididoDe, l }, i) => {
     const descFolha = texto(l[3]);
-    const { desc: descManual, ...sobreposicao } = SOBREPOSICOES[marca] || {};
+    const ig = instagram(l[4]);
+    const nombre = marca || (ig ? capitalizar(ig) : nomeReserva || persona);
+    const { desc: descManual, ...sobreposicao } = SOBREPOSICOES[marca] || SOBREPOSICOES[nombre] || {};
     // A desc manual substitui o texto completo, para a ficha não mostrar o original.
     const descCompleta = descManual ? texto(descManual) : descFolha;
-    const ig = instagram(l[4]);
     const e = {
       id: `E-${String(i + 1).padStart(3, "0")}`,
-      nombre: marca || (ig ? capitalizar(ig) : nomeReserva || persona),
+      nombre,
       categoria: categoria(marca, descFolha),
       foraneo,
       estado: "",
@@ -179,11 +204,25 @@ export function lerExpositores() {
     return { ...e, ...sobreposicao };
   });
 
-  const marcas = new Set(brutos.map(r => r.marca));
+  const chaves = new Set(EXPOSITORES.flatMap(e => [e.marca, e.nombre]));
   for (const m of Object.keys(SOBREPOSICOES))
-    if (!marcas.has(m)) console.warn(`aviso: a sobreposição "${m}" não corresponde a nenhuma marca da folha`);
+    if (!chaves.has(m)) console.warn(`aviso: a sobreposição "${m}" não corresponde a nenhuma marca nem nome da folha`);
 
-  return EXPOSITORES;
+  // A marca serve para casar uma pasta de fotos com o mesmo nome; não há contacto.
+  for (const [k, n] of NOVOS_EXPOSITORES.entries()) {
+    const desc = texto(n.desc);
+    EXPOSITORES.push({
+      id: `E-${String(brutos.length + k + 1).padStart(3, "0")}`,
+      nombre: n.nombre, categoria: n.categoria, foraneo: n.foraneo, estado: n.estado || "",
+      desc: cortar(desc), desc_full: desc,
+      rango: n.rango || "", stand: n.stand || "", pagos: n.pagos || "",
+      wa: n.wa || "", ig: n.ig || "", fotos: [],
+      contacto: "", marca: n.nombre, divididoDe: "",
+    });
+  }
+
+  // Foráneos primeiro, também para os novos (sort estável: mantém a ordem dentro de cada grupo)
+  return EXPOSITORES.sort((x, y) => y.foraneo - x.foraneo);
 }
 
 const principal = import.meta.url === pathToFileURL(process.argv[1] || "").href;

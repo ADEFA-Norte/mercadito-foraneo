@@ -79,6 +79,24 @@ const NOVOS_EXPOSITORES = [
     wa: "527222644107",
     ig: "brunoyoli",
   },
+  {
+    nombre: "Almas joyeras",
+    foraneo: false,
+    categoria: "Joyería y accesorios",
+    desc: "Joyería y ropa de dama.",
+    rango: "$150 – $900",
+    wa: "525516406212",
+    ig: "almas_joyerass",
+  },
+  {
+    nombre: "Pilu",
+    foraneo: false,
+    categoria: "Joyería y accesorios",
+    desc: "Lentes de sol y accesorios para el cabello.",
+    rango: "$580 – $900",
+    wa: "527352030824",
+    ig: "pilu.studioo",
+  },
 ];
 
 const texto = v => String(v ?? "").replace(/\s+/g, " ").trim();

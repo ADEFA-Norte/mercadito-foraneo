@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "echo 'Sitio estático: sin instalar dependencias'",
+  "buildCommand": "echo 'Sitio estático: los datos y las imágenes se generan en local con npm run build'",
+  "outputDirectory": "."
+}

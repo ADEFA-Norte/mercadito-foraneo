@@ -21,6 +21,19 @@ export const ALIAS_PASTAS = {
   "MARIA FORMIGA": "Maria Formiga Mx Br",
 };
 
+// Fotos sueltas que van a otro negocio que el de su carpeta. Destino: marca, nombre,
+// contacto o id, como en ALIAS_PASTAS. Ruta: "<pasta>/<fichero>".
+export const ASIGNAR_FOTOS = new Map(Object.entries({
+  // REGINA RAMOS casa con Revu Shop; la ilustración naranja es de Snacks Anahuacnorte
+  "REGINA RAMOS/WhatsApp Image 2026-09-22 at 9.36.31 PM.jpeg": "Snacks Anahuacnorte",
+}).map(([r, d]) => [r.normalize("NFC"), d]));
+
+// Portada elegida a mano: va primera en la ficha y es la miniatura de la tarjeta.
+// Gana sobre la regla automática (logo, o la foto más cuadrada). Ruta: "<pasta>/<fichero>".
+export const PORTADAS = new Set([
+  "ALMAS JOYERAS/IMG_6809 - Sheyla Ramírez.jpeg",  // anillos plateados con corazón rojo
+].map(r => r.normalize("NFC")));
+
 // Fotos que están en la carpeta de un negocio pero no son suyas. No se borran de
 // fotos-originais/; solo se ignoran. Ruta: "<pasta>/<fichero>".
 export const EXCLUIR_FOTOS = new Set([
@@ -40,6 +53,11 @@ const tokens = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
   .replace(/[^a-z0-9]+/g, " ").trim().split(" ").filter(Boolean);
 const chave = s => tokens(s).join(" ");
 const porNome = (a, b) => a.localeCompare(b, "es", { numeric: true });
+
+const porDestino = (destino, expositores) => {
+  const alvo = chave(destino);
+  return expositores.filter(e => e.id === destino || [e.marca, e.nombre, e.contacto].some(v => v && chave(v) === alvo));
+};
 
 function candidatos(pasta, expositores) {
   const alias = Object.entries(ALIAS_PASTAS).find(([p]) => chave(p) === chave(pasta));
@@ -78,9 +96,16 @@ export function emparelharPastas(expositores, { silencioso = false } = {}) {
       const ext = extname(f).toLowerCase();
       if (ext === ".pdf") { res.pdfs.push(rel); continue; }
       if (!EXTENSOES.has(ext)) { res.ignorados.push(rel); continue; }
-      if (EXCLUIR_FOTOS.has(`${pasta}/${f}`.normalize("NFC"))) { res.excluidos.push(rel); continue; }
-      if (!res.porId.has(id)) res.porId.set(id, []);
-      res.porId.get(id).push(rel);
+      const clave = `${pasta}/${f}`.normalize("NFC");
+      if (EXCLUIR_FOTOS.has(clave)) { res.excluidos.push(rel); continue; }
+      let destino = id;
+      if (ASIGNAR_FOTOS.has(clave)) {
+        const otros = porDestino(ASIGNAR_FOTOS.get(clave), expositores);
+        if (otros.length === 1) destino = otros[0].id;
+        else if (!silencioso) console.warn(`aviso: ASIGNAR_FOTOS "${clave}" → "${ASIGNAR_FOTOS.get(clave)}" casa con ${otros.length} negocios; se queda en ${id}`);
+      }
+      if (!res.porId.has(destino)) res.porId.set(destino, []);
+      res.porId.get(destino).push(rel);
     }
   }
   return res;

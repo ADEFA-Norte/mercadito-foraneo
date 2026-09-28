@@ -7,7 +7,7 @@ import { readFileSync, mkdirSync, readdirSync, unlinkSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { basename, dirname, join } from "node:path";
 import sharp from "sharp";
-import { PASTA_ORIGINAIS, PASTA_SAIDA, emparelharPastas, caminhoFoto, caminhoThumb } from "./fotos.mjs";
+import { PASTA_ORIGINAIS, PASTA_SAIDA, PORTADAS, emparelharPastas, caminhoFoto, caminhoThumb } from "./fotos.mjs";
 import { lerExpositores } from "./build-data.mjs";
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -54,7 +54,10 @@ const gerar = (origem, destino, largura) =>
 // menos no corte) e, em empate, a de maior resolução. |ln(l/a)| trata igual
 // retrato e paisagem, por isso a rotação EXIF não altera a escolha.
 const eLogo = f => /logo/i.test(basename(f).normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
+const ePortada = f => PORTADAS.has(f.slice(PASTA_ORIGINAIS.length + 1).normalize("NFC"));
 async function ordenar(lista) {
+  const elegida = lista.find(ePortada);
+  if (elegida) return [elegida, ...lista.filter(f => f !== elegida)];
   const logos = lista.filter(eLogo);
   const candidatas = logos.length ? logos : lista;
   const medidas = await Promise.all(candidatas.map(async f => {

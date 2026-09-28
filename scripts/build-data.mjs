@@ -50,6 +50,8 @@ const SOBREPOSICOES = {
   "Maria Formiga Mx Br": { rango: "$25 – $350", wa: "525541774506" },
   // Foráneo sin marca ni Instagram: en la folha solo está el nombre de la persona
   "Sofía Giménez Rodríguez": { nombre: "Sookies" },
+  // Foráneo sin marca: el nombre sale del Instagram (antoj.lab)
+  "Antoj Lab": { nombre: "Antojo Lab" },
 };
 
 // Negócios que não estão na folha. Entram depois dos da folha, com os ids seguintes.
@@ -226,12 +228,13 @@ export function lerExpositores() {
       contacto: persona,
       marca,
       divididoDe,
+      nombreFolha: nombre,
     };
     return { ...e, ...sobreposicao };
   });
 
   // contacto: una sobreposición puede cambiar el nombre (Sookies); la clave es el nombre de la persona
-  const chaves = new Set(EXPOSITORES.flatMap(e => [e.marca, e.nombre, e.contacto]));
+  const chaves = new Set(EXPOSITORES.flatMap(e => [e.marca, e.nombre, e.contacto, e.nombreFolha]));
   for (const m of Object.keys(SOBREPOSICOES))
     if (!chaves.has(m)) console.warn(`aviso: a sobreposição "${m}" não corresponde a nenhuma marca nem nome da folha`);
 
@@ -266,7 +269,7 @@ if (principal) {
   for (const e of EXPOSITORES) e.fotos = (porId.get(e.id) || []).map((_, k) => caminhoFoto(e.id, k + 1));
 
   // Escrita — sem os campos internos
-  const publico = EXPOSITORES.map(({ contacto, marca, divididoDe, ...e }) => e);
+  const publico = EXPOSITORES.map(({ contacto, marca, divididoDe, nombreFolha, ...e }) => e);
   const html = readFileSync(INDEX, "utf8");
   const a = html.indexOf(INICIO), b = html.indexOf(FIM);
   if (a < 0 || b < a) {

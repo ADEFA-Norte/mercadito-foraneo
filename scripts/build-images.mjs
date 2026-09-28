@@ -2,7 +2,7 @@
 //   img/expositores/<id>-1.webp, -2.webp… a 900px (ficha); a -1 é a capa
 //   img/expositores/<id>-thumb.webp a 500px, da mesma capa (tarjeta)
 // O casamento pasta → expositor está em fotos.mjs.
-// Uso: node scripts/build-images.mjs   (e depois node scripts/build-data.mjs, se o aviso final aparecer)
+// Uso: npm run build   (build-data y después build-images, en ese orden)
 import { readFileSync, mkdirSync, readdirSync, unlinkSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { basename, dirname, join } from "node:path";
@@ -18,6 +18,22 @@ const LARGURA_THUMB = 500;
 // Os expositores vêm da planilha, com contacto e marca, e com os mesmos ids que build-data
 const EXPOSITORES = lerExpositores();
 const { porId, semCasar, ambiguas, pdfs, ignorados, excluidos } = emparelharPastas(EXPOSITORES);
+
+// Seguro antes de borrar: el index.html tiene que tener todos los ids que salen
+// de la hoja. Si no (build-data sin correr después de cambiar la hoja), la página
+// apuntaría a imágenes que este script está a punto de borrar o renombrar.
+const html = readFileSync(join(RAIZ, "index.html"), "utf8");
+const bloco = html.split("/* EXPOSITORES:inicio */")[1]?.split("/* EXPOSITORES:fim */")[0];
+const noSite = bloco ? new Function(`${bloco};return EXPOSITORES`)() : [];
+const idsSite = new Set(noSite.map(e => e.id));
+const faltanEnSite = EXPOSITORES.filter(e => !idsSite.has(e.id));
+if (faltanEnSite.length) {
+  console.error(`\nERROR: el index.html no tiene ${faltanEnSite.length} de los ${EXPOSITORES.length} ids que salen de la hoja:`);
+  for (const e of faltanEnSite.slice(0, 10)) console.error(`  ${e.id}  ${e.nombre}`);
+  if (faltanEnSite.length > 10) console.error(`  … y ${faltanEnSite.length - 10} más`);
+  console.error("No se borró ninguna imagen. Corre primero node scripts/build-data.mjs, o usa npm run build.");
+  process.exit(1);
+}
 
 // Apaga o que foi gerado antes, para não ficarem fotos de ids que mudaram
 const saida = join(RAIZ, PASTA_SAIDA);
@@ -93,9 +109,6 @@ for (const e of semFoto.filter(e => e.divididoDe)) {
 }
 
 // O index.html tem de apontar para estas imagens
-const html = readFileSync(join(RAIZ, "index.html"), "utf8");
-const bloco = html.split("/* EXPOSITORES:inicio */")[1]?.split("/* EXPOSITORES:fim */")[0];
-const noSite = bloco ? new Function(`${bloco};return EXPOSITORES`)() : [];
 const esperado = id => JSON.stringify((porId.get(id) || []).map((_, k) => caminhoFoto(id, k + 1)));
 const desatualizados = EXPOSITORES.filter(e => JSON.stringify(noSite.find(s => s.id === e.id)?.fotos || []) !== esperado(e.id));
 if (desatualizados.length)

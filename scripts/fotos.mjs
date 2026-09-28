@@ -29,6 +29,8 @@ export const EXCLUIR_FOTOS = new Set([
   "CLAUDIA CARRASCO/WhatsApp Image 2026-09-23 at 7.54.14 PM (1).jpeg",
   "CLAUDIA CARRASCO/WhatsApp Image 2026-09-23 at 7.54.14 PM (2).jpeg",
   "CLAUDIA CARRASCO/WhatsApp Image 2026-09-23 at 7.54.14 PM.jpeg",
+  // Antojo Lab: logo con fondo claro, sustituido por "logo antojo lab.jpeg" (fondo guinda)
+  "NERI CABRAL/WhatsApp Image 2026-09-26 at 15.43.06.jpeg",
 ].map(r => r.normalize("NFC")));
 
 export const caminhoFoto = (id, k) => `${PASTA_SAIDA}/${id}-${k}.webp`;

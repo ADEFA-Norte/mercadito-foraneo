@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "build": "node scripts/build-data.mjs && node scripts/build-images.mjs"
+  },
   "dependencies": {
     "sharp": "^0.35.4",
     "xlsx": "^0.18.5"
